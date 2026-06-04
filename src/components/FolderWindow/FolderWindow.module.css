@@ -188,10 +188,10 @@ button.light {
 
 @media (max-width: 720px) {
   .gridFeatured,
-  .grid,
-  .gridSquares {
+  .grid {
     grid-template-columns: 1fr;
   }
+  /* .gridSquares keeps repeat(2, 1fr) from the 900px rule */
 }
 
 @media (max-width: 480px) {
@@ -229,6 +229,10 @@ button.light {
   .grid,
   .gridSquares {
     gap: 16px;
+  }
+
+  .gridSquares {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 

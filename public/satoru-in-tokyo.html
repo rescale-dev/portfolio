@@ -175,15 +175,15 @@
   /* TOUCH */
   #touch { position:absolute; bottom:0; left:0; right:0; height:120px; display:none; z-index:4; }
   .tbtn {
-    position:absolute; width:74px; height:74px; bottom:18px;
+    position:absolute; width:100px; height:84px; bottom:18px;
     border:4px solid rgba(42,216,255,0.6);
     background:rgba(15,12,40,0.5);
     display:flex; align-items:center; justify-content:center;
-    font-size:18px; color:rgba(42,216,255,0.9);
+    font-size:22px; color:rgba(42,216,255,0.9);
     pointer-events:all;
   }
   .tbtn:active { background:rgba(42,216,255,0.3); transform:scale(0.96); }
-  #tL { left:18px; } #tR { left:104px; } #tJ { right:18px; }
+  #tL { left:12px; } #tR { right:12px; } #tJ { display:none; }
 
   @media (max-width:500px), (max-height:700px) {
     #wrap { width:100vw; height:100vh; max-height:100vh; }
@@ -983,7 +983,10 @@ function updatePlayer(dt) {
           }
           lastFloorJumped = pl.floor;
         }
-        if (!wasOnGround) { spawnLand(p.x + p.w/2, p.y + p.h); sfxLand(); }
+        if (!wasOnGround) {
+          spawnLand(p.x + p.w/2, p.y + p.h); sfxLand();
+          if (isTouch()) jumpBufferT = JUMP_BUFFER;
+        }
         p.vy = 0;
         p.onGround = true;
         p.standingOn = pl;
@@ -1109,8 +1112,11 @@ function startGame() {
   $('menu').style.display = 'none';
   $('overlay').style.display = 'none';
   $('hud').style.display = 'flex';
-  $('scoreBar').style.display = 'block';
-  if (isTouch()) $('touch').style.display = 'block';
+  if (!isTouch()) $('scoreBar').style.display = 'block';
+  if (isTouch()) {
+    $('touch').style.display = 'block';
+    $('tJ').style.display = 'none';
+  }
   initGame();
   state = 'playing';
   lastT = performance.now();

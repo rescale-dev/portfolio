@@ -31,3 +31,9 @@
   height: 0;
   will-change: transform;
 }
+
+/* Prevent the browser from cancelling pointer events on canvas children
+   (touch-action: auto on a child triggers pointercancel, stopping pan). */
+.layer * {
+  touch-action: none;
+}

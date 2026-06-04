@@ -100,6 +100,12 @@
   transform: translateY(-50%) translateX(0);
 }
 
+@media (max-width: 768px) {
+  .root {
+    display: none;
+  }
+}
+
 /* Phones: keep the rail discreet against the narrow board. */
 @media (max-width: 480px) {
   .root {

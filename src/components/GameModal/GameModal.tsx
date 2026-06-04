@@ -63,7 +63,7 @@ export function GameModal({ onClose }: GameModalProps) {
       </div>
       <p className={styles.hint}>
         {isTouch
-          ? 'Use the on-screen arrows to move, ▲ to jump · Tap outside to close'
+          ? '← → arrows to move · character auto-jumps · Tap outside to close'
           : 'Click the game, then use ← → and ↑ / Space · Esc to close'}
       </p>
     </div>

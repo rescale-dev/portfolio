@@ -16,6 +16,7 @@ import { ExperiencePanel } from './components/ExperiencePanel/ExperiencePanel'
 import { PancakeSticker } from './components/PancakeSticker/PancakeSticker'
 import { RecipeModal } from './components/RecipeModal/RecipeModal'
 import { WeatherSticker } from './components/WeatherSticker/WeatherSticker'
+import { useIsTouch } from './hooks/useIsTouch'
 import { folders, aboutCard, experience } from './data/items'
 import type { FolderItem } from './data/items'
 
@@ -25,6 +26,9 @@ const STAGGER = 0.16
 type Pos = { x: number; y: number }
 
 export default function App() {
+  const isTouch = useIsTouch()
+  const posScale = isTouch ? 0.7 : 1
+
   const [hintVisible, setHintVisible] = useState(true)
   const [openFolder, setOpenFolder] = useState<FolderItem | null>(null)
   const [gameOpen, setGameOpen] = useState(false)
@@ -33,12 +37,15 @@ export default function App() {
   const [aboutOpen, setAboutOpen] = useState(false)
   const [experienceOpen, setExperienceOpen] = useState(false)
   const [recipeOpen, setRecipeOpen] = useState(false)
-  const [stickerPos, setStickerPos] = useState<Pos>({ x: -10, y: 490 })
-  const [weatherPos, setWeatherPos] = useState<Pos>({ x: 620, y: -415 })
-  const [gameLauncherPos, setGameLauncherPos] = useState<Pos>({ x: 0, y: -470 })
-  const [aboutCardPos, setAboutCardPos] = useState<Pos>(aboutCard.position)
+  const [stickerPos, setStickerPos] = useState<Pos>({ x: -10 * posScale, y: 490 * posScale })
+  const [weatherPos, setWeatherPos] = useState<Pos>({ x: 620 * posScale, y: -415 * posScale })
+  const [gameLauncherPos, setGameLauncherPos] = useState<Pos>({ x: 0, y: -470 * posScale })
+  const [aboutCardPos, setAboutCardPos] = useState<Pos>({
+    x: aboutCard.position.x * posScale,
+    y: aboutCard.position.y * posScale,
+  })
   const [folderPositions, setFolderPositions] = useState<Pos[]>(
-    folders.map(f => f.position)
+    folders.map(f => ({ x: f.position.x * posScale, y: f.position.y * posScale }))
   )
 
   // Warm up decoding of the card cover images during the typing phase, so the

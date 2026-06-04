@@ -11,7 +11,7 @@ type CanvasProps = {
 /** Base zoom of the board, so more of the layout is visible on first load. */
 const BASE_SCALE = 0.8
 /** Touch devices start a touch more zoomed-out so the board reads at a glance. */
-const TOUCH_SCALE = 0.6
+const TOUCH_SCALE = 0.55
 const TOUCH_MIN_SCALE = 0.35
 const TOUCH_MAX_SCALE = 1.3
 
