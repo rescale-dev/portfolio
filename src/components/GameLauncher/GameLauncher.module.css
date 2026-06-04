@@ -1,0 +1,154 @@
+.root {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 250px;
+  user-select: none;
+  text-align: center;
+  cursor: var(--cursor-hand);
+}
+.root * { cursor: var(--cursor-hand); }
+
+/* Entrance animation lives as global `.board-in` / `.board-hidden` (index.css). */
+.inner {
+  transform-origin: center center;
+}
+
+/* Arcade cabinet panel — chunky pixel frame. */
+.cabinet {
+  position: relative;
+  padding: 13px 13px 15px;
+  background: #1b1233;
+  border: 4px solid #0c0820;
+  box-shadow: 0 8px 0 #0c0820, 10px 12px 0 rgba(0, 0, 0, 0.35);
+  image-rendering: pixelated;
+  transition: transform 0.16s steps(2), box-shadow 0.16s steps(2);
+}
+
+.root:hover .cabinet {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 0 #0c0820, 14px 16px 0 rgba(0, 0, 0, 0.4);
+}
+.root:active .cabinet {
+  transform: translateY(2px);
+  box-shadow: 0 6px 0 #0c0820, 8px 10px 0 rgba(0, 0, 0, 0.35);
+}
+
+/* Mini game screen with an animated slime. */
+.screen {
+  position: relative;
+  height: 122px;
+  background: linear-gradient(180deg, #241a3e 0%, #140e26 100%);
+  border: 4px solid #0c0820;
+  overflow: hidden;
+}
+
+/* Satoru the pixel cat. */
+.cat {
+  position: absolute;
+  left: 22%;
+  bottom: 28%;
+  width: 18px;
+  height: 15px;
+  background: #f3e9d6;
+  border: 2px solid #2e2018;
+  border-radius: 3px;
+  animation: hop 0.9s steps(2) infinite;
+}
+/* triangular ears */
+.cat::before,
+.cat::after {
+  content: '';
+  position: absolute;
+  top: -7px;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-bottom: 7px solid #f3e9d6;
+}
+.cat::before { left: -1px; }
+.cat::after { right: -1px; }
+.eye {
+  position: absolute;
+  top: 4px;
+  width: 2px;
+  height: 4px;
+  background: #6be0a8;
+  box-shadow: 0 0 0 0.5px #16280c;
+}
+
+@keyframes hop {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  50% { transform: translateY(-22px) scaleY(1.1); }
+}
+
+.plat {
+  position: absolute;
+  width: 38%;
+  height: 7px;
+  background: #241c4a;
+  border-top: 3px solid #2ad8ff;
+  box-shadow: 0 0 8px rgba(42, 216, 255, 0.6), 0 3px 0 #140f2c;
+}
+
+/* CRT scanlines. */
+.scan {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0) 0px,
+    rgba(0, 0, 0, 0) 2px,
+    rgba(0, 0, 0, 0.22) 2px,
+    rgba(0, 0, 0, 0.22) 4px
+  );
+}
+
+.marquee {
+  margin-top: 12px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: var(--color-red);
+  text-shadow: 2px 2px 0 #7a0a12;
+}
+
+.play {
+  margin-top: 11px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: #fff;
+  background: var(--color-red);
+  border: 3px solid #0c0820;
+  padding: 7px 0;
+  box-shadow: 0 4px 0 #8a0a14;
+}
+
+.title {
+  font-size: 26px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--color-red);
+  margin: 22px 0 12px;
+  text-align: center;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.tag {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.04em;
+  color: var(--color-muted);
+  background: transparent;
+  border: 2px solid var(--color-border);
+  border-radius: 4px;
+  padding: 7px 10px;
+  white-space: nowrap;
+}

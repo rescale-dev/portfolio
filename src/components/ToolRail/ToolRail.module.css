@@ -1,0 +1,125 @@
+.root {
+  position: fixed;
+  top: 50%;
+  left: 16px;
+  transform: translateY(-50%);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  white-space: nowrap;
+  padding-left: 2px;
+}
+
+.rail {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 9px;
+  background: color-mix(in srgb, var(--color-white) 80%, transparent);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  box-shadow: 0 10px 26px rgba(19, 24, 43, 0.08);
+}
+
+.tool {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  cursor: pointer;
+  transition: transform 0.16s ease;
+}
+
+.tool:hover {
+  transform: scale(1.12);
+}
+
+/* White tile for image/svg logos (Cloud Design, Figma). */
+.tile {
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+}
+
+.tool svg,
+.tool img {
+  width: 22px;
+  height: 22px;
+  display: block;
+}
+
+/* Hover label that slides out to the right. */
+.tooltip {
+  position: absolute;
+  left: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%) translateX(-4px);
+  padding: 6px 10px;
+  background: var(--color-pill);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  border-radius: 8px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.16s ease, transform 0.16s ease;
+}
+
+.tooltip::before {
+  content: '';
+  position: absolute;
+  left: -4px;
+  top: 50%;
+  transform: translateY(-50%) rotate(45deg);
+  width: 8px;
+  height: 8px;
+  background: var(--color-pill);
+  border-radius: 1px;
+}
+
+.tool:hover .tooltip {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
+/* Phones: keep the rail discreet against the narrow board. */
+@media (max-width: 480px) {
+  .root {
+    left: 10px;
+    gap: 7px;
+  }
+  .label {
+    display: none;
+  }
+  .rail {
+    gap: 7px;
+    padding: 7px;
+  }
+  .tool {
+    width: 30px;
+    height: 30px;
+  }
+  .tool svg,
+  .tool img {
+    width: 19px;
+    height: 19px;
+  }
+}

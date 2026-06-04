@@ -1,0 +1,162 @@
+.root {
+  position: fixed;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 12px 10px 18px;
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  box-shadow: 0 10px 28px rgba(19, 24, 43, 0.1);
+}
+
+.emailWrap {
+  position: relative;
+}
+
+.email {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-ink);
+  text-decoration: none;
+  white-space: nowrap;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: var(--cursor-hand);
+  font-family: var(--font-sans);
+  transition: color 0.16s ease;
+}
+
+.mailIcon {
+  width: 17px;
+  height: 17px;
+}
+
+.email:hover {
+  color: var(--color-red);
+}
+
+.divider {
+  width: 1px;
+  height: 22px;
+  background: var(--color-border-soft);
+}
+
+.icons {
+  display: flex;
+  gap: 6px;
+}
+
+.icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-muted);
+  background: var(--color-chip);
+  transition: transform 0.16s ease, background 0.16s ease, color 0.16s ease;
+}
+
+.icon svg {
+  width: 17px;
+  height: 17px;
+}
+
+/* No stray focus ring on the icon buttons/links (the phone button kept it
+   after a click). Keyboard users still get the hover-style tint via :focus-visible. */
+.icon:focus,
+.email:focus {
+  outline: none;
+}
+
+.icon:hover {
+  transform: translateY(-2px);
+}
+
+.gmail:hover {
+  background: #fdecea;
+  color: #ea4335;
+}
+
+.linkedin:hover {
+  background: #e8f1fb;
+  color: #0a66c2;
+}
+
+.phone:hover {
+  background: #e7f6ec;
+  color: #1aa260;
+}
+
+.instagram:hover {
+  background: #fce4ec;
+  color: #e1306c;
+}
+
+/* Subtle keyboard-only focus feedback, replacing the removed outline. */
+.icon:focus-visible {
+  background: var(--color-border);
+  color: var(--color-ink);
+}
+
+.phoneWrap {
+  position: relative;
+}
+
+.tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-pill);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  padding: 6px 12px;
+  border-radius: 999px;
+  pointer-events: none;
+  animation: tooltipPop 0.18s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--color-pill);
+}
+
+@keyframes tooltipPop {
+  from { opacity: 0; transform: translateX(-50%) translateY(4px) scale(0.9); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0)   scale(1);   }
+}
+
+/* Phones: drop the long email text (icon still copies) so the pill stays narrow,
+   and lift it clear of the home-bar / safe area. */
+@media (max-width: 480px) {
+  .root {
+    bottom: max(16px, env(safe-area-inset-bottom));
+    gap: 10px;
+    padding: 8px 12px;
+  }
+  .emailText {
+    display: none;
+  }
+  .icon {
+    width: 38px;
+    height: 38px;
+  }
+}

@@ -1,0 +1,199 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  background: rgba(19, 24, 43, 0.26);
+  backdrop-filter: blur(20px) saturate(1.05);
+  -webkit-backdrop-filter: blur(20px) saturate(1.05);
+  animation: fade 0.22s ease both;
+}
+
+.window {
+  width: min(860px, 95vw);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-white);
+  border-radius: 16px;
+  box-shadow: 0 40px 120px rgba(19, 24, 43, 0.4);
+  overflow: hidden;
+  transform-origin: center;
+  animation: pop 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.titlebar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 16px;
+  background: var(--color-chip);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.lights {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 8px;
+}
+
+.light {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: none;
+  padding: 0;
+  cursor: var(--cursor-hand);
+}
+
+.red {
+  background: #ff5f57;
+}
+
+.winTitle {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--color-muted);
+}
+
+.body {
+  padding: 40px 48px;
+  overflow-y: auto;
+}
+
+.layout {
+  display: flex;
+  gap: 48px;
+  align-items: flex-start;
+}
+
+.textCol {
+  flex: 1;
+  min-width: 0;
+}
+
+.headline {
+  font-size: 48px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-ink);
+  margin: 0 0 24px;
+  white-space: pre-line;
+}
+
+.headlineHello {
+  color: #f97316;
+}
+
+.para {
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--color-muted);
+  margin: 0 0 16px;
+  max-width: 60ch;
+}
+
+.para:last-child {
+  margin-bottom: 0;
+}
+
+.photoWrap {
+  flex-shrink: 0;
+  width: 260px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--color-chip);
+}
+
+.photo {
+  width: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+@media (max-width: 640px) {
+  .layout {
+    flex-direction: column;
+  }
+
+  .photoWrap {
+    width: 100%;
+  }
+
+  .body {
+    padding: 28px 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .backdrop {
+    padding: 14px;
+  }
+
+  .window {
+    width: 100%;
+    max-height: 92vh;
+  }
+
+  .body {
+    padding: 22px 18px;
+  }
+
+  .headline {
+    font-size: 34px;
+    margin: 0 0 18px;
+  }
+
+  .para {
+    font-size: 15px;
+  }
+}
+
+@keyframes fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes popOut {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.94) translateY(8px);
+  }
+}
+
+.backdropClosing {
+  animation: fadeOut 0.22s ease both;
+}
+
+.windowClosing {
+  animation: popOut 0.24s cubic-bezier(0.4, 0, 0.6, 1) both;
+}

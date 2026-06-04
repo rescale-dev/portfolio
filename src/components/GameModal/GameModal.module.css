@@ -1,0 +1,133 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 140;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 32px;
+  background: rgba(8, 6, 16, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  animation: fade 0.22s ease both;
+}
+
+.backdropClosing {
+  animation: fadeOut 0.22s ease both;
+}
+
+/* Chunky pixel frame around the game canvas. */
+.frame {
+  position: relative;
+  width: 480px;
+  max-width: 96vw;
+  border: 6px solid #0c0820;
+  background: #0b0716;
+  box-shadow: 0 10px 0 #0c0820, 0 30px 90px rgba(0, 0, 0, 0.6);
+  image-rendering: pixelated;
+  animation: pop 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.frameClosing {
+  animation: popOut 0.24s cubic-bezier(0.4, 0, 0.6, 1) both;
+}
+
+.game {
+  display: block;
+  width: 480px;
+  height: 640px;
+  max-width: 96vw;
+  /* Keep the 480:640 (3:4) ratio when width is constrained on small screens. */
+  aspect-ratio: 3 / 4;
+  border: 0;
+  background: #0b0716;
+}
+
+.hint {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.8;
+  letter-spacing: 1px;
+  color: #9aa4ba;
+  text-align: center;
+  margin: 0;
+  pointer-events: none;
+}
+
+.close {
+  position: fixed;
+  top: 22px;
+  right: 26px;
+  z-index: 141;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #0c0820;
+  background: #ffd54a;
+  color: #0b1f06;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 16px;
+  line-height: 1;
+  cursor: var(--cursor-hand);
+  box-shadow: 0 4px 0 #b8800f;
+  transition: transform 0.12s steps(2);
+}
+
+.close:hover {
+  transform: translateY(-2px);
+}
+.close:active {
+  transform: translateY(2px);
+}
+
+/* Phones: fit the 3:4 game within both width and height, shrink chrome.
+   Both dimensions are given explicitly (no `auto`) so the iframe — a replaced
+   element carrying width/height attributes — never collapses. The two min()
+   pairs keep the 3:4 ratio whether width (92vw) or height (76vh) is the limit. */
+@media (max-width: 600px) {
+  .backdrop {
+    padding: 12px;
+    gap: 10px;
+  }
+  .frame {
+    width: max-content;
+    max-width: 94vw;
+  }
+  .game {
+    width: min(92vw, 57vh);
+    height: min(122.6vw, 76vh);
+    max-width: none;
+    aspect-ratio: auto;
+  }
+  .close {
+    top: max(14px, env(safe-area-inset-top));
+    right: 16px;
+    width: 46px;
+    height: 46px;
+  }
+  .hint {
+    font-size: 7px;
+    padding: 0 12px;
+  }
+}
+
+@keyframes fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+@keyframes pop {
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes popOut {
+  from { opacity: 1; transform: scale(1) translateY(0); }
+  to { opacity: 0; transform: scale(0.95) translateY(10px); }
+}

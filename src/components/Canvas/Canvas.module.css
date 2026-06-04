@@ -1,0 +1,33 @@
+.viewport {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  cursor: var(--cursor-arrow);
+  touch-action: none;
+  background-color: var(--color-bg);
+  transition: background-color 0.3s ease;
+}
+
+.dragging,
+.dragging * {
+  cursor: grabbing;
+}
+
+/* Dot grid that scrolls with the canvas to reinforce the "infinite board" feel. */
+.dots {
+  position: absolute;
+  inset: -2px;
+  background-image: radial-gradient(var(--color-dot) 1px, transparent 1px);
+  background-size: 24px 24px;
+  pointer-events: none;
+}
+
+/* Origin sits at the centre of the viewport; children are placed relative to it. */
+.layer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  will-change: transform;
+}

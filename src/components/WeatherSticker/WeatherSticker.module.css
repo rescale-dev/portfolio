@@ -1,0 +1,106 @@
+.root {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 120px;
+  user-select: none;
+  cursor: grab;
+}
+.root:active { cursor: grabbing; }
+.root * { cursor: inherit; }
+
+/* Entrance animation lives as global `.board-in` / `.board-hidden` (index.css). */
+.inner {
+  transform-origin: center center;
+}
+
+/* Die-cut sticker: no box — illustration + caption tilt together. */
+.sticker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: rotate(4deg);
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.root:hover .sticker {
+  transform: rotate(0deg) scale(1.06);
+}
+.root:active .sticker {
+  transform: rotate(0deg) scale(1.0);
+}
+
+.art {
+  width: 92px;
+  height: 92px;
+}
+.art svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* White die-cut border hugging the illustration's alpha shape
+     (8 directions ≈ ~2px) + a soft contact shadow. */
+  filter:
+    drop-shadow(2px 0 0 #fff) drop-shadow(-2px 0 0 #fff)
+    drop-shadow(0 2px 0 #fff) drop-shadow(0 -2px 0 #fff)
+    drop-shadow(1.5px 1.5px 0 #fff) drop-shadow(-1.5px 1.5px 0 #fff)
+    drop-shadow(1.5px -1.5px 0 #fff) drop-shadow(-1.5px -1.5px 0 #fff)
+    drop-shadow(0 6px 7px rgba(19, 24, 43, 0.26));
+}
+
+/* ── Caption ───────────────────────────────────────────────
+   No box — text floats on the board. A white halo keeps it
+   legible on the light board; in dark mode the ink token flips
+   light and the halo is harmless. */
+.caption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: -2px;
+  text-shadow:
+    0 0 3px #fff,
+    1px 0 0 #fff, -1px 0 0 #fff, 0 1px 0 #fff, 0 -1px 0 #fff,
+    1px 1px 0 #fff, -1px 1px 0 #fff, 1px -1px 0 #fff, -1px -1px 0 #fff;
+}
+:root[data-theme='dark'] .caption {
+  text-shadow:
+    0 0 4px rgba(14, 17, 24, 0.9),
+    1px 1px 0 rgba(14, 17, 24, 0.7), -1px -1px 0 rgba(14, 17, 24, 0.7);
+}
+
+.city {
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.temp {
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  color: var(--color-ink);
+}
+
+.jp {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  margin-top: 1px;
+}
+
+.kanji {
+  font-size: 14px;
+  font-weight: 800;
+  color: #E8762A;
+  letter-spacing: 0.04em;
+}
+
+.romaji {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-muted);
+  letter-spacing: 0.02em;
+}

@@ -1,0 +1,96 @@
+.root {
+  position: absolute;
+  top: 0;
+  left: 0;
+  user-select: none;
+}
+
+/* Entrance animation lives as global `.board-in` / `.board-hidden` (index.css). */
+.inner {
+  transform-origin: center center;
+}
+
+.card {
+  position: relative;
+  width: 300px;
+  background: var(--color-red);
+  border-radius: 22px;
+  padding: 24px;
+  color: var(--color-white);
+  box-shadow: 0 18px 40px rgba(245, 51, 63, 0.28);
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+  cursor: var(--cursor-hand);
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 26px 54px rgba(245, 51, 63, 0.38);
+}
+
+/* Hover: darken the texts to the deep navy used in the "PORTFOLIO" wordmark. */
+.card:hover .title,
+.card:hover .kana,
+.card:hover .readmore {
+  color: var(--color-ink);
+}
+
+.card:active {
+  transform: translateY(-2px);
+}
+
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.title {
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.05;
+  margin: 0;
+  white-space: pre-line;
+  transition: color 0.2s ease;
+}
+
+.kana {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin-top: 6px;
+  white-space: nowrap;
+  transition: color 0.2s ease;
+}
+
+.thumbWrap {
+  width: 100%;
+  height: 168px;
+  overflow: hidden;
+  border-radius: 8px;
+  margin-top: 18px;
+  background: var(--color-ink);
+}
+
+.thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Crop a little tighter on the face (upper-centre of the frame). */
+  object-position: center 22%;
+  transform: scale(1.32);
+}
+
+.readmore {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  margin-top: 16px;
+  transition: color 0.2s ease;
+}
+
+.arrow {
+  font-weight: 700;
+}

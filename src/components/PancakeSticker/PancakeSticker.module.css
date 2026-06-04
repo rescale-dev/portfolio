@@ -1,0 +1,91 @@
+.root {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 185px;
+  user-select: none;
+  cursor: var(--cursor-hand);
+}
+.root * { cursor: var(--cursor-hand); }
+
+/* Entrance animation lives as global `.board-in` / `.board-hidden` (index.css). */
+.inner {
+  position: relative;
+  transform-origin: center center;
+}
+
+/* Die-cut sticker: white outline hugging the PNG's alpha shape via stacked
+   white drop-shadows, plus a soft contact shadow underneath. */
+.sticker {
+  position: relative;
+  transform: rotate(-7deg);
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.root:hover .sticker {
+  transform: rotate(0deg) scale(1.06);
+}
+.root:active .sticker {
+  transform: rotate(0deg) scale(1.0);
+}
+
+.img {
+  display: block;
+  width: 100%;
+  height: auto;
+  /* White die-cut border (8 directions × 2 passes ≈ ~5px) + drop shadow. */
+  filter:
+    drop-shadow(2.5px 0 0 #fff) drop-shadow(-2.5px 0 0 #fff)
+    drop-shadow(0 2.5px 0 #fff) drop-shadow(0 -2.5px 0 #fff)
+    drop-shadow(1.8px 1.8px 0 #fff) drop-shadow(-1.8px 1.8px 0 #fff)
+    drop-shadow(1.8px -1.8px 0 #fff) drop-shadow(-1.8px -1.8px 0 #fff)
+    drop-shadow(0 6px 7px rgba(19, 24, 43, 0.28));
+}
+
+/* Vertical Japanese label, like a sticker caption. */
+.kana {
+  position: absolute;
+  top: 6px;
+  right: -10px;
+  writing-mode: vertical-rl;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #fff;
+  text-shadow: 0 0 3px rgba(0, 0, 0, 0.4), 1px 1px 0 #e8762a;
+  pointer-events: none;
+}
+
+/* "Recipe?" speech bubble shown on hover. */
+.tooltip {
+  position: absolute;
+  bottom: calc(100% - 6px);
+  left: 50%;
+  transform: translateX(-50%) translateY(6px) scale(0.9);
+  background: var(--color-pill);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  padding: 6px 13px;
+  border-radius: 999px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.16s ease, transform 0.16s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--color-pill);
+}
+
+.root:hover .tooltip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0) scale(1);
+}

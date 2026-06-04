@@ -1,0 +1,131 @@
+:root {
+  /* Brand tokens */
+  --color-ink: #13182b;
+  --color-red: #eb4c27;
+  --color-white: #ffffff;
+  --color-muted: #5a6275;
+  --color-dot: #e9ebf1;
+  /* Page background (sits behind the white surfaces) + shared UI tokens. */
+  --color-bg: #ffffff;
+  --color-border: #e7e9ef;
+  --color-border-soft: #e2e5ea;
+  --color-chip: #f3f4f7;
+  /* Card delineation: no border in light, shadow does the work. */
+  --color-card-border: transparent;
+  --color-card-shadow: rgba(19, 24, 43, 0.1);
+  /* Always-dark pill (onboarding hint, tooltips) with white text. */
+  --color-pill: #13182b;
+
+  --font-sans: 'Satoshi', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* Figma-style custom cursors (SVG data URIs, hotspot after the url). */
+  --cursor-arrow: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M4%203.2%20L4%2019%20L8.3%2014.9%20L11%2020.8%20L13.5%2019.6%20L10.8%2013.8%20L16.2%2013.6%20Z%22%20fill%3D%22%230d0d0d%22%20stroke%3D%22%23ffffff%22%20stroke-width%3D%221.4%22%20stroke-linejoin%3D%22round%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E") 4 3, auto;
+  --cursor-hand: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2226%22%20height%3D%2226%22%20viewBox%3D%220%200%2026%2026%22%3E%3Cpath%20d%3D%22M9.4%203.4%20c0-1%200.8-1.8%201.8-1.8%201%200%201.8%200.8%201.8%201.8%20V11%20h0.7%20V8.9%20c0-1%200.8-1.7%201.7-1.7%201%200%201.7%200.8%201.7%201.7%20V11%20h0.7%20V9.7%20c0-0.9%200.8-1.7%201.7-1.7%200.9%200%201.7%200.8%201.7%201.7%20v5.1%20c0%203-2.5%205.6-5.6%205.6%20h-1.5%20c-1.6%200-3.1-0.7-4.2-1.9%20l-3.6-4%20c-0.6-0.7-0.5-1.7%200.2-2.3%200.6-0.5%201.6-0.5%202.2%200.1%20L9.4%2014%20Z%22%20fill%3D%22%230d0d0d%22%20stroke%3D%22%23ffffff%22%20stroke-width%3D%221.3%22%20stroke-linejoin%3D%22round%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E") 8 2, pointer;
+
+  font-family: var(--font-sans);
+  color: var(--color-ink);
+  cursor: var(--cursor-arrow);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Dark theme: re-map the tokens. Surfaces (--color-white) stay lighter than
+   the page background (--color-bg) so cards keep their lift. */
+:root[data-theme='dark'] {
+  --color-ink: #eef1f7;
+  --color-white: #1a2030;
+  --color-muted: #98a2b8;
+  --color-dot: #232a3a;
+  --color-bg: #0e1118;
+  --color-border: #2b3242;
+  --color-border-soft: #2b3242;
+  --color-chip: #262d3d;
+  --color-pill: #2b3242;
+  /* In dark, a subtle light edge separates cards from the background;
+     the navy shadow is invisible, so use a deeper one. */
+  --color-card-border: rgba(255, 255, 255, 0.1);
+  --color-card-shadow: rgba(0, 0, 0, 0.45);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+:root[data-theme='dark'] * {
+  scrollbar-color: #2b3242 transparent;
+  scrollbar-width: thin;
+}
+
+:root[data-theme='dark'] *::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+:root[data-theme='dark'] *::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+:root[data-theme='dark'] *::-webkit-scrollbar-thumb {
+  background: #2b3242;
+  border-radius: 999px;
+}
+
+:root[data-theme='dark'] *::-webkit-scrollbar-thumb:hover {
+  background: #3a4358;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  overflow: hidden;
+  background: var(--color-bg);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+/* Entrance for board items (catalogs, about, game) after the title types in.
+   Applied to an INNER wrapper (never the positioned .root), so the scale is
+   purely visual and can't fight each item's translate-based placement.
+   Only transform + opacity → fully compositor-driven, no paint/layout cost.
+
+   NOTE: keyframe + the classes below both live here (global). They must NOT be
+   moved into a *.module.css that references them by name — CSS Modules hashes
+   the `animation-name` reference but not the global keyframe, leaving a dangling
+   name so the animation silently never runs. Keeping both global avoids that. */
+@keyframes boardItemIn {
+  from { opacity: 0; transform: scale(0.6); translate: 0 16px; }
+  to   { opacity: 1; transform: scale(1);   translate: 0 0; }
+}
+
+.board-hidden {
+  opacity: 0;
+  transform: scale(0.6);
+  translate: 0 16px;
+}
+
+.board-in {
+  animation: boardItemIn 0.75s cubic-bezier(0.4, 0, 0.2, 1) both;
+  will-change: transform, opacity;
+}
+
+/* Gentle fade for the fixed chrome (profile, tools, contact) on first load.
+   Same global keyframe + global class pairing as above (see note). */
+@keyframes introFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.intro-fade {
+  animation: introFade 0.6s ease 2.3s both;
+}
