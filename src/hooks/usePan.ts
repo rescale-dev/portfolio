@@ -45,6 +45,7 @@ export function usePan({
 }: UsePanOptions = {}) {
   const layerRef = useRef<HTMLDivElement | null>(null)
   const bgRef = useRef<HTMLDivElement | null>(null)
+  const viewportRef = useRef<HTMLDivElement | null>(null)
 
   const offset = useRef({ x: 0, y: 0 })
   const scaleRef = useRef(scale)
@@ -269,10 +270,25 @@ export function usePan({
 
   useEffect(() => stopInertia, [stopInertia])
 
+  // Hard guard against the browser cancelling a touch pan. React's onTouchMove
+  // is passive (can't preventDefault), so attach a native non-passive listener:
+  // while a gesture is active, swallow the default to stop any native
+  // selection / scroll / callout that would fire pointercancel and end the pan.
+  useEffect(() => {
+    const el = viewportRef.current
+    if (!el) return
+    const onTouchMove = (e: TouchEvent) => {
+      if (isPanning.current || pinching.current) e.preventDefault()
+    }
+    el.addEventListener('touchmove', onTouchMove, { passive: false })
+    return () => el.removeEventListener('touchmove', onTouchMove)
+  }, [])
+
   return {
     isDragging,
     layerRef,
     bgRef,
+    viewportRef,
     bind: {
       onPointerDown,
       onPointerMove,

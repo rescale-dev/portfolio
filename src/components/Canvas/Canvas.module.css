@@ -32,8 +32,16 @@
   will-change: transform;
 }
 
-/* Prevent the browser from cancelling pointer events on canvas children
-   (touch-action: auto on a child triggers pointercancel, stopping pan). */
+/* Prevent the browser from cancelling pointer events on canvas children.
+   On touch, dragging across a card would otherwise start native text
+   selection / image callout / image drag, firing pointercancel and stopping
+   the pan. Disabling all of those on the whole canvas subtree keeps the
+   pointer stream alive no matter what's under the finger. */
+.viewport,
 .layer * {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
   touch-action: none;
 }

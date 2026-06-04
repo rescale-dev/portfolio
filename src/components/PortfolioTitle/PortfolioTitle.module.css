@@ -117,3 +117,22 @@
   opacity: 1;
   transform: scale(1);
 }
+
+/* The hero sits inside the 0.55-scaled canvas layer on touch, so bump the
+   sizes well past the clamp floor to read large against the cards. */
+@media (max-width: 768px) {
+  .wordmark {
+    font-size: 96px;
+  }
+  .welcome {
+    font-size: 17px;
+    letter-spacing: 0.3em;
+  }
+  .kana {
+    font-size: 20px;
+  }
+  .subtitle {
+    font-size: 16px;
+    letter-spacing: 0.26em;
+  }
+}

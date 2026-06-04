@@ -858,7 +858,10 @@ function updatePlayer(dt) {
   if (p.onGround) p.landTime += dt;
   else p.landTime = 0;
 
-  const jumpHeld = keys.J || touch.J;
+  // On touch the character auto-jumps; treat the button as always held so the
+  // upward-velocity damping never fires — every bounce reaches full height,
+  // exactly like holding Space on desktop.
+  const jumpHeld = keys.J || touch.J || isTouch();
   const wantJump = jumpBufferT > 0 || (jumpHeld && p.onGround);
 
   if (wantJump) {

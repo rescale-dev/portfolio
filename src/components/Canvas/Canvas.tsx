@@ -19,7 +19,7 @@ export function Canvas({ children, onFirstMove }: CanvasProps) {
   const isTouch = useIsTouch()
   const scale = isTouch ? TOUCH_SCALE : BASE_SCALE
 
-  const { isDragging, layerRef, bgRef, bind } = usePan({
+  const { isDragging, layerRef, bgRef, viewportRef, bind } = usePan({
     scale,
     onFirstMove,
     enableZoom: isTouch,
@@ -29,6 +29,7 @@ export function Canvas({ children, onFirstMove }: CanvasProps) {
 
   return (
     <div
+      ref={viewportRef}
       className={`${styles.viewport} ${isDragging ? styles.dragging : ''}`}
       {...bind}
     >

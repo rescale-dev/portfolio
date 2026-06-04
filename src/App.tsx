@@ -25,9 +25,24 @@ const STAGGER = 0.16
 
 type Pos = { x: number; y: number }
 
+// Hand-tuned mobile layout (canvas/layer space). The cards keep their fixed
+// 320px size while the layer is zoomed out, so the desktop scatter can't just
+// be scaled down — it overlaps. These positions sit the four cards in the
+// corners (clearing the enlarged hero's vertical band) with the small items on
+// the axis, leaving generous gaps so nothing overlaps. Keyed by item id.
+const MOBILE_POS: Record<string, Pos> = {
+  'graphic-design': { x: -340, y: -450 },
+  motion: { x: 340, y: -450 },
+  'case-study': { x: -340, y: 450 },
+  about: { x: 340, y: 450 },
+  game: { x: 0, y: -540 },
+  pancake: { x: 0, y: 540 },
+  weather: { x: -470, y: 0 },
+}
+
 export default function App() {
   const isTouch = useIsTouch()
-  const posScale = isTouch ? 0.7 : 1
+  const pos = (id: string, desktop: Pos): Pos => (isTouch ? MOBILE_POS[id] : desktop)
 
   const [hintVisible, setHintVisible] = useState(true)
   const [openFolder, setOpenFolder] = useState<FolderItem | null>(null)
@@ -37,15 +52,12 @@ export default function App() {
   const [aboutOpen, setAboutOpen] = useState(false)
   const [experienceOpen, setExperienceOpen] = useState(false)
   const [recipeOpen, setRecipeOpen] = useState(false)
-  const [stickerPos, setStickerPos] = useState<Pos>({ x: -10 * posScale, y: 490 * posScale })
-  const [weatherPos, setWeatherPos] = useState<Pos>({ x: 620 * posScale, y: -415 * posScale })
-  const [gameLauncherPos, setGameLauncherPos] = useState<Pos>({ x: 0, y: -470 * posScale })
-  const [aboutCardPos, setAboutCardPos] = useState<Pos>({
-    x: aboutCard.position.x * posScale,
-    y: aboutCard.position.y * posScale,
-  })
+  const [stickerPos, setStickerPos] = useState<Pos>(pos('pancake', { x: -10, y: 490 }))
+  const [weatherPos, setWeatherPos] = useState<Pos>(pos('weather', { x: 620, y: -415 }))
+  const [gameLauncherPos, setGameLauncherPos] = useState<Pos>(pos('game', { x: 0, y: -470 }))
+  const [aboutCardPos, setAboutCardPos] = useState<Pos>(pos('about', aboutCard.position))
   const [folderPositions, setFolderPositions] = useState<Pos[]>(
-    folders.map(f => ({ x: f.position.x * posScale, y: f.position.y * posScale }))
+    folders.map(f => pos(f.id, f.position))
   )
 
   // Warm up decoding of the card cover images during the typing phase, so the
