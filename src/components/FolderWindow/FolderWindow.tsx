@@ -98,7 +98,7 @@ export function FolderWindow({ folder, onClose }: FolderWindowProps) {
               <span className={styles.placeholder} aria-hidden="true" />
             )
           ) : (
-            <img className={styles.playerImg} src={work.image} alt={work.title} draggable={false} />
+            <img className={styles.playerImg} src={work.image} alt={work.title} draggable={false} loading="lazy" />
           )}
           {work.lightboxVimeoId && (
             <span className={styles.playIcon} aria-hidden="true">{playIcon}</span>

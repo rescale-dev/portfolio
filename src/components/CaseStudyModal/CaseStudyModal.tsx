@@ -83,7 +83,7 @@ export function CaseStudyModal({ study, onClose }: CaseStudyModalProps) {
           {gallery && gallery.length > 0 && (
             <div className={styles.gallery}>
               {gallery.map((src) => (
-                <img key={src} className={styles.galleryImg} src={src} alt={client} draggable={false} />
+                <img key={src} className={styles.galleryImg} src={src} alt={client} draggable={false} loading="lazy" />
               ))}
             </div>
           )}

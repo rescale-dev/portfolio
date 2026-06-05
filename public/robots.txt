@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://damiandesign.pl/sitemap.xml

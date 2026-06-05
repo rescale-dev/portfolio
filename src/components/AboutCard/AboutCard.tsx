@@ -40,7 +40,7 @@ export function AboutCard({ data, revealed = true, revealDelay = 0, onOpen, posi
             <span className={styles.kana} aria-hidden="true">私について</span>
           </div>
           <div className={styles.thumbWrap}>
-            <img className={styles.thumb} src={thumbnail} alt="Damian portrait" draggable={false} />
+            <img className={styles.thumb} src={thumbnail} alt="Damian portrait" draggable={false} fetchPriority="high" />
           </div>
           <p className={styles.readmore}>
             Read More <span className={styles.arrow}>{'->'}</span>
