@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { FolderItem, Work } from '../../data/items'
 import { CaseStudyModal } from '../CaseStudyModal/CaseStudyModal'
+import { StoryDeck } from '../StoryDeck/StoryDeck'
 import styles from './FolderWindow.module.css'
 
 /** Play glyph shown on tiles that open a video lightbox. */
@@ -25,7 +26,7 @@ const expandIcon = (
 
 /** Mac-style window that opens over a blurred backdrop and shows the folder's works. */
 export function FolderWindow({ folder, onClose }: FolderWindowProps) {
-  const { title, works = [], sections, window: text, expandable = false, logos } = folder
+  const { title, works = [], sections, window: text, expandable = false, logos, pages, badge } = folder
   const featured = works.filter((w) => w.featured)
   const rest = works.filter((w) => !w.featured)
 
@@ -136,11 +137,12 @@ export function FolderWindow({ folder, onClose }: FolderWindowProps) {
             />
           </div>
           <span className={styles.winTitle}>{title}</span>
+          {badge && <span className={styles.badge}>{badge}</span>}
         </div>
 
         {/* Scrollable content. */}
         <div className={styles.body}>
-          {text && (
+          {text && ((text.batches && text.batches.length > 0) || !pages) && (
             <div className={`${styles.header} ${text.centered ? styles.headerCentered : ''}`}>
               {text.batches && text.batches.length > 0 && (
                 <div className={styles.batches}>
@@ -151,12 +153,14 @@ export function FolderWindow({ folder, onClose }: FolderWindowProps) {
                   ))}
                 </div>
               )}
-              <h2 className={styles.headline}>{text.headline}</h2>
-              {text.subline && <p className={styles.subline}>{text.subline}</p>}
+              {!pages && <h2 className={styles.headline}>{text.headline}</h2>}
+              {!pages && text.subline && <p className={styles.subline}>{text.subline}</p>}
             </div>
           )}
 
-          {sections
+          {pages ? (
+            <StoryDeck pages={pages} />
+          ) : sections
             ? sections.map((sec, si) => {
                 const offset = sections
                   .slice(0, si)

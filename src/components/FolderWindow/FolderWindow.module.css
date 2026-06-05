@@ -74,6 +74,34 @@ button.light {
   color: var(--color-muted);
 }
 
+/* Small status badge pinned to the top-right of the title bar. */
+.badge {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-ink);
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  padding: 4px 11px;
+}
+
+.badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #eb4c27;
+}
+
 .body {
   padding: 32px;
   overflow-y: auto;

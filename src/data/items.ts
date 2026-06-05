@@ -48,6 +48,34 @@ export type WorkSection = {
   works: Work[]
 }
 
+/** One column inside a multi-column story block: optional text above, media (image or video), optional caption below. */
+export type StoryColumn = { text?: string; image?: string; video?: string; caption?: string }
+
+/** One content block inside a story page. */
+export type StoryBlock = {
+  text?: string
+  image?: string
+  /**
+   * 'full'    = image spans full width under any text.
+   * 'columns' = two or more side-by-side columns, each with text above its image.
+   */
+  layout?: 'full' | 'columns'
+  /** Columns shown side by side when layout is 'columns'. */
+  columns?: StoryColumn[]
+}
+
+/** A single subpage inside an AI-Creative style catalog, reached via a top nav tile. */
+export type StoryPage = {
+  id: string
+  /** Tile label shown in the top navigation. */
+  label: string
+  headline?: string
+  subline?: string
+  blocks?: StoryBlock[]
+  /** When true, the subpage shows a "Coming soon" placeholder instead of content. */
+  comingSoon?: boolean
+}
+
 export type FolderItem = {
   id: string
   title: string
@@ -74,6 +102,10 @@ export type FolderItem = {
   sections?: WorkSection[]
   /** Header block shown above the works grid. */
   window?: { headline: string; subline?: string; batches?: string[]; centered?: boolean }
+  /** Small badge shown in the top-right of the window title bar (e.g. "Concept work"). */
+  badge?: string
+  /** Paginated story pages shown instead of the works grid (e.g. AI Creative). */
+  pages?: StoryPage[]
   /** When true, clicking a tile opens the lightbox. Default: false for image-only folders. */
   expandable?: boolean
   /** Logo bar shown at the bottom of the window. */
@@ -171,7 +203,7 @@ export const folders: FolderItem[] = [
           { id: 'sm-guseppe', title: 'Guseppe', tag: 'Dr. Oetker', image: '/graphic/social-guseppe.jpg' },
           { id: 'sm-yokaba', title: 'Euphoria Spa', tag: 'Yokaba', image: '/graphic/social-yokaba.jpg' },
           { id: 'sm-slodkachwila', title: 'Słodka Chwila', tag: 'Dr. Oetker', image: '/graphic/social-slodkachwila.jpg' },
-          { id: 'sm-tortoreo', title: 'Tort Oreo', tag: 'Wszystkiego Słodkiego', image: '/graphic/social-tortoreo.png' },
+          { id: 'sm-tortoreo', title: 'Tort Oreo', tag: 'Wszystkiego Słodkiego', image: '/graphic/social-tortoreo.jpg' },
         ],
       },
       {
@@ -179,8 +211,8 @@ export const folders: FolderItem[] = [
         description:
           'Performance creatives developed for Meta Ads and Google Ads campaigns. I collaborated closely with SEM specialists to design static and video, including format adaptations tailored to campaign requirements and placements.',
         works: [
-          { id: 'pa-hama', title: 'Smartwatch 8900', tag: 'Hama', image: '/graphic/ads-hama.png' },
-          { id: 'pa-hebda', title: 'Nutta', tag: 'K. Hebda', image: '/graphic/ads-hebda.png' },
+          { id: 'pa-hama', title: 'Smartwatch 8900', tag: 'Hama', image: '/graphic/ads-hama.jpg' },
+          { id: 'pa-hebda', title: 'Nutta', tag: 'K. Hebda', image: '/graphic/ads-hebda.jpg' },
           { id: 'pa-elektrospark', title: 'Wiertarko-wkrętarka', tag: 'Elektrospark', image: '/graphic/ads-elektrospark.jpg' },
           { id: 'pa-zenetik', title: 'iPhone 14 Pro', tag: 'Zenetik', image: '/graphic/ads-zenetik.png' },
         ],
@@ -198,7 +230,7 @@ export const folders: FolderItem[] = [
             image: '/graphic/kv-vilaro.jpg',
             lightboxGallery: [
               { type: 'image', src: '/graphic/kv-vilaro.jpg' },
-              { type: 'image', src: '/graphic/kv-vilaro2.png' },
+              { type: 'image', src: '/graphic/kv-vilaro2.jpg' },
               { type: 'video', vimeoId: '1167118036' },
             ],
           },
@@ -358,6 +390,100 @@ export const folders: FolderItem[] = [
       },
     ],
   },
+  {
+    id: 'ai-creative',
+    title: 'AI Creative',
+    subtitles: ['AI Workflow', 'Gen AI'],
+    preview: '/ai/zabka.jpg',
+    accentDots: ['#eb4c27', '#13182b'],
+    sample: { title: 'AI Workflow', description: 'Brand aligned ad assets, AI assisted' },
+    position: { x: 300, y: 430 }, // bottom-center, beside the pancake sticker
+    enabled: true,
+    window: { headline: 'AI Creative' },
+    badge: 'Concept work',
+    pages: [
+      {
+        id: 'ai-workflow',
+        label: 'AI Workflow',
+        headline: 'AI Workflow',
+        subline:
+          'I generated a brand identity moodboard based on the website and online promotional materials so that the AI would be more precise when creating ad assets.',
+        blocks: [
+          { image: '/ai/brand-identity.jpg', layout: 'full' },
+          {
+            layout: 'columns',
+            columns: [
+              {
+                text:
+                  "Based on the developed moodboard, I generated an ad creative designed to encourage target audiences to open their own store under the brand's franchise.",
+                image: '/ai/ad-creative.jpg',
+              },
+              {
+                text:
+                  'Using the raw AI output as a foundation, I created the final graphic asset. Moving the project outside the AI environment into Figma and Photoshop allowed me to take full control over the layout. This step ensured crisp image sharpness, the integration of official vector typography, and total alignment with the brand guidelines.',
+                image: '/ai/zabka.jpg',
+              },
+            ],
+          },
+          {
+            layout: 'full',
+            text:
+              'To ensure maximum campaign flexibility and performance testing, I implemented the final design into the advanced Magnific Flow environment.\n\nI developed distinct creative variations (A/B/N testing) featuring different characters and background layouts. For each variant, I generated 3 automatic reformats tailored specifically to the requirements of Meta and Google Ads campaigns. This automated workflow produced a complete, visually consistent ad set ready for immediate optimization and launch.',
+            image: '/ai/magnific-flow.jpg',
+          },
+        ],
+      },
+      {
+        id: 'ai-photo',
+        label: 'AI Photo',
+        headline: 'AI Photo',
+        subline:
+          'I generate images by combining text prompts with reference graphics to control style and composition. Depending on the project needs, I produce standalone assets, full mixed media creatives, or keyframes that serve as starting points for video generation. I treat AI as a flexible foundation. Sometimes the output is ready to go, and other times it serves as an element for further editing.',
+        blocks: [
+          {
+            layout: 'columns',
+            columns: [
+              { image: '/ai/ai-photo-product.jpg', caption: 'Product Creative' },
+              { image: '/ai/ai-photo-reach.jpg', caption: 'Creation for Reach' },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'ai-video',
+        label: 'AI Video',
+        headline: 'AI Video',
+        subline:
+          'I create video assets using the Kling model, operating with keyframes, typically generating motion between the first and last frame. I never rely on text prompts alone. To maintain control, I always use a pre generated reference image as my starting point. The resulting clips are used as dynamic B-roll or creative backgrounds, perfect for further editing and post production.',
+        blocks: [
+          {
+            layout: 'columns',
+            columns: [
+              { video: '/ai/ai-video-product.mp4', caption: 'Product Creative' },
+              { video: '/ai/ai-video-reach.mp4', caption: 'Creation for Reach' },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'ai-upscale',
+        label: 'AI Upscale',
+        headline: 'AI Upscale',
+        subline:
+          'Clients very often provide low quality images or have a heavily limited asset library. In this section, I demonstrate how I tackle this common issue. Using a sample image from Pinterest, I showcase the process: first, I upscale the resolution using AI, and then I take it a step further by modifying the visual to give it a premium, studio grade product look. This approach allows me to turn poor source material into a phenomenal, high quality creative.',
+        blocks: [
+          {
+            layout: 'columns',
+            columns: [
+              { image: '/ai/upscale-before.jpg', caption: 'Before' },
+              { image: '/ai/upscale-upscaled.jpg', caption: 'Upscaled' },
+              { image: '/ai/upscale-final.jpg', caption: 'Final' },
+            ],
+          },
+        ],
+      },
+    ],
+  },
 ]
 
 export const aboutCard: AboutCardData = {
@@ -370,5 +496,5 @@ export const aboutCard: AboutCardData = {
     "I've spent some time working at agencies in Warsaw and Lublin, and these days I'm also doing my own thing as a freelancer. I'm naturally curious, so I'm always trying out new stuff. Whether that's messing around with 3D or diving deeper into UI/UX. To make sure I don't fall behind, I've also become pretty good friends with AI. I spend a lot of time in Magnific playing with GenAI models and tweaking them. Fun fact: I actually put this website together myself while playing around with Claude Code!",
     "And when I finally close my laptop? I hit the gym to clear my head and stretch out my back after sitting all day. Lately, I've also been spending my free time flying my drone, and I've gotten completely hooked on photography 📸",
   ],
-  position: { x: 820, y: 430 },
+  position: { x: 800, y: 370 },
 }

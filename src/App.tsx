@@ -34,6 +34,7 @@ const MOBILE_POS: Record<string, Pos> = {
   'graphic-design': { x: -340, y: -450 },
   motion: { x: 340, y: -450 },
   'case-study': { x: -340, y: 450 },
+  'ai-creative': { x: 470, y: 0 },
   about: { x: 340, y: 450 },
   game: { x: 0, y: -540 },
   pancake: { x: 0, y: 540 },
@@ -63,7 +64,7 @@ export default function App() {
   // Warm up decoding of the card cover images during the typing phase, so the
   // first frame of the reveal animation never waits on an image decode.
   useEffect(() => {
-    ;['/graphic/kv-vilaro.jpg', '/case/landscaping-cover.jpg', '/about-me.jpg'].forEach((src) => {
+    ;['/graphic/kv-vilaro.jpg', '/case/landscaping-cover.jpg', '/ai/zabka.jpg', '/about-me.jpg'].forEach((src) => {
       const img = new Image()
       img.src = src
       img.decode?.().catch(() => {})

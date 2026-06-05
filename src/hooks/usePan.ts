@@ -149,6 +149,14 @@ export function usePan({
           velocity.current = { x: 0, y: 0 }
           startPointer.current = { x: e.clientX, y: e.clientY }
           lastPointer.current = { x: e.clientX, y: e.clientY }
+          // Capture immediately so the whole gesture stays owned by the viewport.
+          // Without this, crossing a card / <video> child mid-pan can fire
+          // pointercancel and stop the pan ("scroll" feels interrupted).
+          try {
+            ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
+          } catch {
+            // Ignore: synthetic/inactive pointers can't be captured.
+          }
         }
         return
       }
@@ -283,6 +291,29 @@ export function usePan({
     el.addEventListener('touchmove', onTouchMove, { passive: false })
     return () => el.removeEventListener('touchmove', onTouchMove)
   }, [])
+
+  // Two-finger trackpad / wheel panning (desktop). macOS two-finger swipe emits
+  // wheel events with deltaX/deltaY; pinch-zoom comes through with ctrlKey set,
+  // which we leave to the browser. Native non-passive listener so we can
+  // preventDefault the page from scrolling.
+  useEffect(() => {
+    const el = viewportRef.current
+    if (!el) return
+    const onWheel = (e: WheelEvent) => {
+      if (e.ctrlKey) return
+      e.preventDefault()
+      stopInertia()
+      offset.current.x = clamp(offset.current.x - e.deltaX, bounds.x)
+      offset.current.y = clamp(offset.current.y - e.deltaY, bounds.y)
+      apply()
+      if (!hasMoved.current) {
+        hasMoved.current = true
+        onFirstMove?.()
+      }
+    }
+    el.addEventListener('wheel', onWheel, { passive: false })
+    return () => el.removeEventListener('wheel', onWheel)
+  }, [apply, bounds.x, bounds.y, onFirstMove, stopInertia])
 
   return {
     isDragging,
