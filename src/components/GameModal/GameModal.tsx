@@ -11,6 +11,16 @@ export function GameModal({ onClose }: GameModalProps) {
   const isTouch = useIsTouch()
   const frameRef = useRef<HTMLIFrameElement>(null)
 
+  // Load Press Start 2P only when the game modal is first opened.
+  useEffect(() => {
+    if (document.getElementById('press-start-2p-font')) return
+    const link = document.createElement('link')
+    link.id = 'press-start-2p-font'
+    link.rel = 'stylesheet'
+    link.href = 'https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap'
+    document.head.appendChild(link)
+  }, [])
+
   const [closing, setClosing] = useState(false)
   const handleClose = useCallback(() => {
     if (closing) return

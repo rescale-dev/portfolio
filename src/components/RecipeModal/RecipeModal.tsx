@@ -119,7 +119,7 @@ export function RecipeModal({ onClose }: RecipeModalProps) {
               </div>
             </div>
             <div className={styles.heroImgWrap}>
-              <img className={styles.heroImg} src="/pancakes.png" alt="Stack of fluffy pancakes" draggable={false} />
+              <img className={styles.heroImg} src="/pancakes.webp" alt="Stack of fluffy pancakes" draggable={false} />
             </div>
           </div>
 

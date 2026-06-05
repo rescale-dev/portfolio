@@ -75,7 +75,7 @@ export function PancakeSticker({ onOpen, onPositionChange, position, revealed = 
         style={{ animationDelay: revealed ? `${revealDelay}s` : undefined }}
       >
         <div className={styles.sticker}>
-          <img className={styles.img} src="/pancakes.png" alt="Fluffy pancakes" draggable={false} />
+          <img className={styles.img} src="/pancakes.webp" alt="Fluffy pancakes" draggable={false} />
         </div>
         <span className={styles.tooltip} aria-hidden="true">Recipe?</span>
       </div>
