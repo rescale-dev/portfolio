@@ -31,16 +31,9 @@
 
 .welcome {
   font-size: clamp(11px, 1.25vw, 19px);
-  font-weight: 700;
-  letter-spacing: 0.34em;
-  color: var(--color-muted);
-}
-
-.kana {
-  font-size: clamp(13px, 1.5vw, 22px);
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  color: var(--color-red);
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  color: var(--color-ink);
 }
 
 /* Blinking terminal caret; scales with each segment's font-size via em.
@@ -76,35 +69,105 @@
 
 .wordmark {
   position: relative;
-  font-size: clamp(64px, 9vw, 150px);
+  font-size: clamp(74px, 10.35vw, 173px);
   line-height: 0.9;
   margin: 0;
   white-space: nowrap;
-  color: var(--color-ink);
+  color: #2a2c34;
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Satoshi', sans-serif;
   /* Centred typewriter: the typed text grows symmetrically from the middle. */
   text-align: center;
 }
 
-.port {
-  font-weight: 900;
-  letter-spacing: -0.02em;
+:global(html[data-theme='dark']) .wordmark {
+  color: var(--color-ink);
 }
 
-.folio {
-  font-weight: 300;
-  letter-spacing: 0.01em;
+/* Both letter runs of "portfolio" share the Semibold weight from the source
+   design; the toggle sits between them in place of the middle "o". */
+.word {
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+/* ---- The "o"-shaped theme toggle --------------------------------------- */
+
+/* The switch is an inline SVG rebuilt 1:1 from the source design. The button
+   only frames it; the SVG carries all the geometry. */
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font: inherit;
+  margin: 0 0.01em;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  /* Seat the switch so the pill's bottom is flush with the text baseline
+     (level with the feet of "f" and "l"). */
+  vertical-align: -0.04em;
+  -webkit-tap-highlight-color: transparent;
+  /* Reveal: fade + slight rise, mirroring the per-letter char animation. */
+  opacity: 0;
+  translate: 0 0.04em;
+  transition: opacity 0.22s ease, translate 0.22s ease;
+}
+
+.toggleShow {
+  opacity: 1;
+  translate: 0 0;
+}
+
+.toggle:focus-visible {
+  outline: 2px solid var(--color-red);
+  outline-offset: 0.05em;
+  border-radius: 0.6em;
+}
+
+/* Scales with the wordmark font-size; overflow stays visible so the knob's
+   shadow and slight overhang aren't clipped. */
+.toggleSvg {
+  display: block;
+  height: 0.62em;
+  width: auto;
+  overflow: visible;
+}
+
+/* Knob handle: slides between the two rounded ends of the white groove.
+   The translate distance is in the SVG's user units (groove-left → groove-right). */
+.toggleKnob {
+  transition: transform 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.toggleKnobDark {
+  transform: translateX(175.7px);
+}
+
+/* Sun / moon strokes — the muted grey from the source design. */
+.toggleIcon {
+  fill: none;
+  stroke: #b0b6c2;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 /* Subtitle scales up from 60% as it fades in, once the wordmark is typed.
    transform + opacity only, scaled about its own centre. */
 .subtitle {
-  text-align: center;
+  text-align: right;
   font-size: clamp(11px, 1.25vw, 19px);
-  font-weight: 700;
-  letter-spacing: 0.3em;
-  color: var(--color-muted);
-  margin: 0.1em 0 0;
-  padding-left: 0.3em;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  color: var(--color-ink);
+  /* Drop the subtitle so the gap below the wordmark optically balances the
+     "WELCOME TO MY" gap above it. */
+  margin: 0.35em 0 0;
+  /* letter-spacing adds trailing space on the last glyph; pull it back so the
+     text sits flush with the wordmark's right edge. */
+  padding-right: 0;
+  margin-right: -0.2em;
   opacity: 0;
   transform: scale(0.6);
   transform-origin: center center;
@@ -122,17 +185,14 @@
    sizes well past the clamp floor to read large against the cards. */
 @media (max-width: 768px) {
   .wordmark {
-    font-size: 96px;
+    font-size: 110px;
   }
   .welcome {
     font-size: 17px;
-    letter-spacing: 0.3em;
-  }
-  .kana {
-    font-size: 20px;
+    letter-spacing: 0.2em;
   }
   .subtitle {
     font-size: 16px;
-    letter-spacing: 0.26em;
+    letter-spacing: 0.2em;
   }
 }

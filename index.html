@@ -5,6 +5,27 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
+    <!-- Apply saved theme before paint (default: light) to avoid a flash -->
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem('theme');
+          document.documentElement.dataset.theme = t === 'dark' || t === 'light' ? t : 'light';
+        } catch (e) {
+          document.documentElement.dataset.theme = 'light';
+        }
+      })();
+    </script>
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-V40B9P22QP"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-V40B9P22QP');
+    </script>
+
     <!-- Primary meta -->
     <title>Damian Tylus — Graphic &amp; Motion Designer</title>
     <meta name="description" content="Portfolio of Damian Tylus — Graphic Designer and Motion Designer based in Poland. Specialising in performance ads, social media visuals, motion showreels and AI-assisted creative work." />

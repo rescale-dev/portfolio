@@ -6,7 +6,6 @@ import { FolderWindow } from './components/FolderWindow/FolderWindow'
 import { AboutCard } from './components/AboutCard/AboutCard'
 import { OnboardingHint } from './components/OnboardingHint/OnboardingHint'
 import { ProfileBadge } from './components/ProfileBadge/ProfileBadge'
-import { ThemeToggle } from './components/ThemeToggle/ThemeToggle'
 import { GameLauncher } from './components/GameLauncher/GameLauncher'
 import { GameModal } from './components/GameModal/GameModal'
 import { ToolRail } from './components/ToolRail/ToolRail'
@@ -123,7 +122,6 @@ export default function App() {
 
       {/* Fixed, screen-anchored UI (outside the pannable board). */}
       <header aria-label="Site controls">
-        <ThemeToggle />
         <ProfileBadge onClick={() => setExperienceOpen(true)} />
         <ToolRail />
         <ContactTile />
