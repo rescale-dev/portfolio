@@ -96,6 +96,13 @@ export type FolderItem = {
   enabled: boolean
   /** When true, the card preview media is centered instead of left-anchored. */
   previewCenter?: boolean
+  /** Visual style for the canvas card. 'folder' = 3D folder with work cards
+      that fan out of it on hover. */
+  variant?: 'folder'
+  /** Colour theme for the 'folder' variant. */
+  folderTheme?: 'blue' | 'green' | 'orange' | 'violet'
+  /** Up to 3 image paths shown as the cards peeking out of the folder. */
+  tiles?: string[]
   /** Works shown in the opened window (grid of 3–4 per row). */
   works?: Work[]
   /** Labelled sections shown in the opened window (used instead of `works`). */
@@ -179,9 +186,12 @@ export const folders: FolderItem[] = [
     preview: '/graphic/kv-vilaro.jpg',
     accentDots: ['#eb4c27', '#13182b', '#eb4c27'],
     sample: { title: 'KeyVisual Vilaro Event', description: 'Banners at a film event' },
-    position: { x: -640, y: -340 }, // top-left
+    position: { x: -710, y: -360 }, // top-left
     enabled: true,
     expandable: false,
+    variant: 'folder',
+    folderTheme: 'blue',
+    tiles: ['/graphic/gbs-karmelccino.png', '/graphic/social-slodkachwila.jpg', '/graphic/ads-zenetik.png'],
     window: { headline: 'Graphic Design' },
     logos: [
       { src: '/graphic/logo-droetker.png', alt: 'Dr. Oetker' },
@@ -263,10 +273,14 @@ export const folders: FolderItem[] = [
     // Match the animation's palette: orange (#eb4c27) + black.
     accentDots: ['#eb4c27', '#13182b'],
     sample: { title: 'Welcome Screen', description: 'Loop Animation' },
-    position: { x: 700, y: -90 }, // right
+    position: { x: 785, y: -60 }, // right
     enabled: true,
     previewCenter: true,
     expandable: true,
+    variant: 'folder',
+    folderTheme: 'orange',
+    // A single, always-playing card with the motion-cover loop animation.
+    tiles: ['/motion-cover.mp4'],
     works: [
       { id: 'showreel-2024', title: 'Showreel 2024', tag: 'Showreel', vimeoId: '1167122500', featured: true },
       { id: 'showreel-2023', title: 'Showreel 2023', tag: 'Showreel', vimeoId: '1167121587', featured: true },
@@ -292,9 +306,13 @@ export const folders: FolderItem[] = [
       title: 'Landscaping Company Website',
       description: 'Around 34% more quality phone enquiries after launch.',
     },
-    position: { x: -640, y: 340 }, // bottom-left
+    position: { x: -710, y: 395 }, // bottom-left
     enabled: true,
     expandable: true,
+    variant: 'folder',
+    folderTheme: 'green',
+    // One 16:9 card (citytools social mockup) that slides out like Motion.
+    tiles: ['/case/branding-social.jpg'],
     window: {
       headline: 'Case Studies',
       subline:
@@ -397,8 +415,12 @@ export const folders: FolderItem[] = [
     preview: '/ai/zabka.jpg',
     accentDots: ['#eb4c27', '#13182b'],
     sample: { title: 'AI Workflow', description: 'Brand aligned ad assets, AI assisted' },
-    position: { x: 300, y: 430 }, // bottom-center, beside the pancake sticker
+    position: { x: 335, y: 500 }, // bottom-center, beside the pancake sticker
     enabled: true,
+    variant: 'folder',
+    folderTheme: 'violet',
+    // Two square cards: the żabka "Zostań CEO" ad and the upscale final.
+    tiles: ['/ai/zabka.jpg', '/ai/upscale-final.jpg'],
     window: { headline: 'AI Creative' },
     badge: 'Concept work',
     pages: [
@@ -490,11 +512,11 @@ export const aboutCard: AboutCardData = {
   id: 'about',
   title: "Hello,\nI'm Damian",
   cta: 'Get to know me',
-  thumbnail: '/about-me.jpg',
+  thumbnail: '/about-badge.png',
   portrait: '/fuji6273.jpg',
   bio: [
     "I've spent some time working at agencies in Warsaw and Lublin, and these days I'm also doing my own thing as a freelancer. I'm naturally curious, so I'm always trying out new stuff. Whether that's messing around with 3D or diving deeper into UI/UX. To make sure I don't fall behind, I've also become pretty good friends with AI. I spend a lot of time in Magnific playing with GenAI models and tweaking them. Fun fact: I actually put this website together myself while playing around with Claude Code!",
     "And when I finally close my laptop? I hit the gym to clear my head and stretch out my back after sitting all day. Lately, I've also been spending my free time flying my drone, and I've gotten completely hooked on photography 📸",
   ],
-  position: { x: 800, y: 370 },
+  position: { x: 915, y: 420 },
 }

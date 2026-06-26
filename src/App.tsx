@@ -52,9 +52,9 @@ export default function App() {
   const [aboutOpen, setAboutOpen] = useState(false)
   const [experienceOpen, setExperienceOpen] = useState(false)
   const [recipeOpen, setRecipeOpen] = useState(false)
-  const [stickerPos, setStickerPos] = useState<Pos>(pos('pancake', { x: -10, y: 490 }))
-  const [weatherPos, setWeatherPos] = useState<Pos>(pos('weather', { x: 620, y: -415 }))
-  const [gameLauncherPos, setGameLauncherPos] = useState<Pos>(pos('game', { x: 0, y: -470 }))
+  const [stickerPos, setStickerPos] = useState<Pos>(pos('pancake', { x: -200, y: 545 }))
+  const [weatherPos, setWeatherPos] = useState<Pos>(pos('weather', { x: 695, y: -465 }))
+  const [gameLauncherPos, setGameLauncherPos] = useState<Pos>(pos('game', { x: 0, y: -510 }))
   const [aboutCardPos, setAboutCardPos] = useState<Pos>(pos('about', aboutCard.position))
   const [folderPositions, setFolderPositions] = useState<Pos[]>(
     folders.map(f => pos(f.id, f.position))
@@ -63,7 +63,7 @@ export default function App() {
   // Warm up decoding of the card cover images during the typing phase, so the
   // first frame of the reveal animation never waits on an image decode.
   useEffect(() => {
-    ;['/graphic/kv-vilaro.jpg', '/case/landscaping-cover.jpg', '/ai/zabka.jpg', '/about-me.jpg'].forEach((src) => {
+    ;['/graphic/kv-vilaro.jpg', '/case/landscaping-cover.jpg', '/ai/zabka.jpg', '/about-badge.png'].forEach((src) => {
       const img = new Image()
       img.src = src
       img.decode?.().catch(() => {})

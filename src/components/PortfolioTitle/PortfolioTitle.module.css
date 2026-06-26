@@ -185,7 +185,8 @@
    sizes well past the clamp floor to read large against the cards. */
 @media (max-width: 768px) {
   .wordmark {
-    font-size: 110px;
+    /* +25% over the previous 110px mobile size. */
+    font-size: 138px;
   }
   .welcome {
     font-size: 17px;

@@ -10,7 +10,7 @@ type GameLauncherProps = {
   revealDelay?: number
 }
 
-/** Pixel-art arcade tile on the board that launches the Satoru in Tokyo game. */
+/** macOS-style app icon on the board that launches the Satoru in Tokyo game. */
 export function GameLauncher({ onOpen, position, onPositionChange, revealed = true, revealDelay = 0 }: GameLauncherProps) {
   const isTouch = useIsTouch()
   const { elRef, wasDragged, handlers } = useDraggable(position, onPositionChange)
@@ -33,24 +33,26 @@ export function GameLauncher({ onOpen, position, onPositionChange, revealed = tr
         className={`${styles.inner} ${revealed ? 'board-in' : 'board-hidden'}`}
         style={{ animationDelay: revealed ? `${revealDelay}s` : undefined }}
       >
-      <div className={styles.cabinet}>
-        <div className={styles.screen} aria-hidden="true">
-          <div className={styles.plat} style={{ left: '16%', bottom: '20%' }} />
-          <div className={styles.plat} style={{ left: '54%', bottom: '44%', width: '30%' }} />
+      <div className={styles.icon} aria-hidden="true">
+        <div className={styles.scene}>
+          <span className={styles.moon} />
+          <div className={styles.skyline} />
+          <div className={styles.plat} style={{ left: '14%', bottom: '24%' }} />
+          <div className={styles.plat} style={{ left: '56%', bottom: '46%', width: '30%' }} />
           <div className={styles.cat}>
             <span className={styles.eye} style={{ left: '4px' }} />
             <span className={styles.eye} style={{ right: '4px' }} />
           </div>
           <span className={styles.scan} />
         </div>
-        <div className={styles.marquee}>SATORU</div>
-        <div className={styles.play}>▶ PLAY</div>
+        <span className={styles.gloss} />
+        <span className={styles.play}>▶</span>
       </div>
 
       <p className={styles.title}>Satoru in Tokyo</p>
       <div className={styles.tags}>
-        <span className={styles.tag}>ARCADE</span>
-        <span className={styles.tag}>TOKYO</span>
+        <span className={styles.tag}>Arcade</span>
+        <span className={styles.tag}>Tokyo</span>
       </div>
       </div>
     </div>

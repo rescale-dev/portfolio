@@ -14,48 +14,97 @@
   transform-origin: center center;
 }
 
-/* Arcade cabinet panel — chunky pixel frame. */
-.cabinet {
+/* ---- macOS Big Sur app icon (squircle) -------------------------------- */
+.icon {
   position: relative;
-  padding: 13px 13px 15px;
-  background: #1b1233;
-  border: 4px solid #0c0820;
-  box-shadow: 0 8px 0 #0c0820, 10px 12px 0 rgba(0, 0, 0, 0.35);
-  image-rendering: pixelated;
-  transition: transform 0.16s steps(2), box-shadow 0.16s steps(2);
-}
-
-.root:hover .cabinet {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 0 #0c0820, 14px 16px 0 rgba(0, 0, 0, 0.4);
-}
-.root:active .cabinet {
-  transform: translateY(2px);
-  box-shadow: 0 6px 0 #0c0820, 8px 10px 0 rgba(0, 0, 0, 0.35);
-}
-
-/* Mini game screen with an animated slime. */
-.screen {
-  position: relative;
-  height: 122px;
-  background: linear-gradient(180deg, #241a3e 0%, #140e26 100%);
-  border: 4px solid #0c0820;
+  width: 132px;
+  height: 132px;
+  margin: 0 auto;
+  border-radius: 30px; /* ~22.5% — Big Sur superellipse look */
   overflow: hidden;
+  /* Soft, realistic macOS icon shadow + a hairline rim + top inner sheen. */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 1px 1px rgba(20, 24, 43, 0.18),
+    0 14px 30px rgba(20, 24, 43, 0.28);
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.root:hover .icon {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.26),
+    0 1px 1px rgba(20, 24, 43, 0.2),
+    0 24px 44px rgba(20, 24, 43, 0.34);
+}
+.root:active .icon {
+  transform: translateY(-2px) scale(0.99);
+}
+
+/* The animated game scene that fills the icon (the "gif"). */
+.scene {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #3a2570 0%, #5a2c83 48%, #1d1140 100%);
+  overflow: hidden;
+}
+
+/* Pale Tokyo moon, top-right. */
+.moon {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 35%, #fff7e6 0%, #ffe6a8 70%, #ffd47a 100%);
+  box-shadow: 0 0 14px rgba(255, 224, 150, 0.55);
+}
+
+/* Neon city skyline silhouette along the bottom. */
+.skyline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 40px;
+  background:
+    linear-gradient(180deg, transparent, rgba(10, 6, 26, 0.55)),
+    repeating-linear-gradient(
+      90deg,
+      #160e30 0 12px,
+      #1d1340 12px 16px,
+      #120a28 16px 26px,
+      #241753 26px 30px
+    );
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 22px);
+  mask-image: linear-gradient(180deg, transparent 0, #000 22px);
+}
+
+/* Glowing platforms the cat hops between. */
+.plat {
+  position: absolute;
+  width: 34%;
+  height: 6px;
+  background: #2a1c54;
+  border-top: 3px solid #2ad8ff;
+  border-radius: 2px;
+  box-shadow: 0 0 8px rgba(42, 216, 255, 0.6), 0 3px 0 rgba(12, 8, 30, 0.8);
 }
 
 /* Satoru the pixel cat. */
 .cat {
   position: absolute;
-  left: 22%;
-  bottom: 28%;
+  left: 20%;
+  bottom: 30%;
   width: 18px;
   height: 15px;
   background: #f3e9d6;
   border: 2px solid #2e2018;
   border-radius: 3px;
+  image-rendering: pixelated;
   animation: hop 0.9s steps(2) infinite;
 }
-/* triangular ears */
 .cat::before,
 .cat::after {
   content: '';
@@ -81,16 +130,7 @@
   50% { transform: translateY(-22px) scaleY(1.1); }
 }
 
-.plat {
-  position: absolute;
-  width: 38%;
-  height: 7px;
-  background: #241c4a;
-  border-top: 3px solid #2ad8ff;
-  box-shadow: 0 0 8px rgba(42, 216, 255, 0.6), 0 3px 0 #140f2c;
-}
-
-/* CRT scanlines. */
+/* Faint CRT scanlines for arcade texture. */
 .scan {
   position: absolute;
   inset: 0;
@@ -99,39 +139,65 @@
     180deg,
     rgba(0, 0, 0, 0) 0px,
     rgba(0, 0, 0, 0) 2px,
-    rgba(0, 0, 0, 0.22) 2px,
-    rgba(0, 0, 0, 0.22) 4px
+    rgba(0, 0, 0, 0.14) 2px,
+    rgba(0, 0, 0, 0.14) 4px
   );
 }
 
-.marquee {
-  margin-top: 12px;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 13px;
-  letter-spacing: 2px;
-  color: var(--color-red);
-  text-shadow: 2px 2px 0 #7a0a12;
+/* Glossy diagonal highlight across the squircle. */
+.gloss {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(150deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.06) 26%, transparent 46%);
 }
 
+/* Play affordance — a frosted round button that blooms in on hover. */
 .play {
-  margin-top: 11px;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 9px;
-  letter-spacing: 1px;
+  position: absolute;
+  right: 9px;
+  bottom: 9px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
   color: #fff;
-  background: var(--color-red);
-  border: 3px solid #0c0820;
-  padding: 7px 0;
-  box-shadow: 0 4px 0 #8a0a14;
+  padding-left: 2px; /* optical centre of the triangle */
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  -webkit-backdrop-filter: blur(6px) saturate(140%);
+  backdrop-filter: blur(6px) saturate(140%);
+  box-shadow: 0 2px 8px rgba(10, 6, 26, 0.3);
+  opacity: 0;
+  transform: scale(0.7);
+  transition: opacity 0.2s ease, transform 0.2s ease, background 0.2s ease;
 }
 
+.root:hover .play {
+  opacity: 1;
+  transform: scale(1);
+}
+.root:active .play {
+  background: var(--color-red);
+  border-color: var(--color-red);
+}
+
+/* ---- Label + tags (matches the folder / about cards) ------------------ */
 .title {
   font-size: 26px;
   font-weight: 500;
   letter-spacing: -0.01em;
-  color: var(--color-red);
+  color: var(--color-ink);
   margin: 22px 0 12px;
   text-align: center;
+  transition: color 0.2s ease;
+}
+
+.root:hover .title {
+  color: var(--color-red);
 }
 
 .tags {
@@ -142,13 +208,14 @@
 }
 
 .tag {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 8px;
-  letter-spacing: 0.04em;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   color: var(--color-muted);
   background: transparent;
-  border: 2px solid var(--color-border);
-  border-radius: 4px;
-  padding: 7px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  padding: 7px 14px;
   white-space: nowrap;
 }

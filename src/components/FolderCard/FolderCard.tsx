@@ -12,8 +12,75 @@ type FolderCardProps = {
   onPositionChange?: (pos: { x: number; y: number }) => void
 }
 
+const FOLDER_THEME: Record<string, string> = {
+  blue: styles.themeBlue,
+  green: styles.themeGreen,
+  orange: styles.themeOrange,
+  violet: styles.themeViolet,
+}
+
+/** 3D folder card. The work cards inside fan out of it on hover. */
+function FolderDemo({
+  title,
+  tags,
+  papers,
+  theme = 'blue',
+  idSuffix,
+}: {
+  title: string
+  tags: string[]
+  papers: string[]
+  theme?: string
+  idSuffix: string
+}) {
+  // Unique gradient id per folder, so the four instances don't share one.
+  const gradId = `folderGrad-${idSuffix}`
+  return (
+    <div className={`${styles.folder} ${FOLDER_THEME[theme] ?? ''}`}>
+      <svg className={styles.folderBack} viewBox="0 0 300 266" aria-hidden="true">
+        <defs>
+          <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#8a7cf6" />
+            <stop offset="0.5" stopColor="#7160f0" />
+            <stop offset="1" stopColor="#6353ec" />
+          </linearGradient>
+        </defs>
+        <path
+          d="M34 30 L112 30 C128 30 134 58 158 58 L266 58 Q288 58 288 80 L288 234 Q288 256 266 256 L34 256 Q12 256 12 234 L12 52 Q12 30 34 30 Z"
+          fill={`url(#${gradId})`}
+        />
+      </svg>
+      {/* Work cards peeking out of the folder; they fan up on hover. A single
+          tile (e.g. Motion's looping video) sits centred instead. */}
+      <div
+        className={`${styles.folderPapers} ${papers.length === 1 ? styles.single : ''} ${papers.length === 2 ? styles.two : ''}`}
+        aria-hidden="true"
+      >
+        {papers.slice(0, 3).map((src, i) => (
+          <div key={i} className={styles.paper}>
+            {/\.(mp4|webm|mov)$/i.test(src) ? (
+              <video src={src} autoPlay loop muted playsInline />
+            ) : (
+              <img src={src} alt="" draggable={false} loading="lazy" />
+            )}
+          </div>
+        ))}
+      </div>
+      {/* Front pocket card. */}
+      <div className={styles.folderFront}>
+        <p className={styles.folderTitle}>{title}</p>
+        <div className={styles.folderTags}>
+          {tags.map((t) => (
+            <span key={t}>{t}</span>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function FolderCard({ folder, onOpen, revealed = true, revealDelay = 0, position, onPositionChange }: FolderCardProps) {
-  const { title, subtitles, preview, previewVideo, previewImages, accentDots, sample, enabled, previewCenter } = folder
+  const { title, subtitles, preview, previewVideo, previewImages, accentDots, sample, enabled, previewCenter, variant } = folder
   const isTouch = useIsTouch()
   const pos = position ?? folder.position
   const previewClass = `${styles.preview} ${previewCenter ? styles.previewCenter : ''}`
@@ -36,6 +103,16 @@ export function FolderCard({ folder, onOpen, revealed = true, revealDelay = 0, p
         className={`${styles.inner} ${revealed ? 'board-in' : 'board-hidden'}`}
         style={{ animationDelay: revealed ? `${revealDelay}s` : undefined }}
       >
+      {variant === 'folder' ? (
+        <FolderDemo
+          title={title}
+          tags={subtitles}
+          theme={folder.folderTheme}
+          idSuffix={folder.id}
+          papers={folder.tiles ?? (folder.works ?? []).map((w) => w.image).filter((s): s is string => !!s)}
+        />
+      ) : (
+      <>
       <div className={styles.stack}>
         <div className={`${styles.sheet} ${styles.sheet2}`} />
         <div className={`${styles.sheet} ${styles.sheet1}`} />
@@ -87,6 +164,8 @@ export function FolderCard({ folder, onOpen, revealed = true, revealDelay = 0, p
           </span>
         ))}
       </div>
+      </>
+      )}
       </div>
     </div>
   )

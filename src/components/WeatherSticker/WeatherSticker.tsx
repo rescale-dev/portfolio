@@ -5,399 +5,280 @@ import styles from './WeatherSticker.module.css'
 const CANVAS_SCALE = 0.8
 const DRAG_THRESHOLD = 4
 
+// Warsaw.
 const LAT = 52.2297
 const LON = 21.0122
-const API = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,weathercode,is_day&timezone=Europe/Warsaw`
+const API =
+  `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}` +
+  `&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,precipitation,is_day` +
+  `&hourly=precipitation_probability&forecast_days=1&timezone=Europe/Warsaw`
 
-type WeatherState =
-  | 'clear_day' | 'clear_night'
-  | 'partly_cloudy_day' | 'partly_cloudy_night'
-  | 'overcast' | 'fog'
-  | 'drizzle' | 'rain' | 'heavy_rain'
-  | 'snow' | 'heavy_snow' | 'sleet'
-  | 'thunderstorm'
-  | 'loading' | 'error'
+type Cond =
+  | 'sun' | 'moon'
+  | 'partly' | 'partlyNight'
+  | 'cloudy' | 'fog'
+  | 'drizzle' | 'rain' | 'thunder' | 'snow'
+  | 'wind' | 'loading'
 
-function toState(code: number, isDay: boolean): WeatherState {
-  if (code === 0)                           return isDay ? 'clear_day' : 'clear_night'
-  if (code === 1)                           return isDay ? 'clear_day' : 'clear_night'
-  if (code === 2)                           return isDay ? 'partly_cloudy_day' : 'partly_cloudy_night'
-  if (code === 3)                           return 'overcast'
-  if (code === 45 || code === 48)           return 'fog'
-  if (code >= 51 && code <= 57)            return 'drizzle'
-  if (code === 61 || code === 63 || code === 80 || code === 81) return 'rain'
-  if (code === 65 || code === 82)           return 'heavy_rain'
-  if (code === 66 || code === 67)           return 'sleet'
-  if (code === 71 || code === 73 || code === 77 || code === 85) return 'snow'
-  if (code === 75 || code === 86)           return 'heavy_snow'
-  if (code >= 95)                           return 'thunderstorm'
-  return isDay ? 'clear_day' : 'clear_night'
+/** Map a WMO weather code (+ day/night and wind) to one of our conditions. */
+function toCondition(code: number, isDay: boolean, wind: number): Cond {
+  if (code >= 95) return 'thunder'
+  if (code === 45 || code === 48) return 'fog'
+  if (code >= 51 && code <= 57) return 'drizzle'
+  if ((code >= 61 && code <= 67) || (code >= 80 && code <= 82)) return 'rain'
+  if ((code >= 71 && code <= 77) || code === 85 || code === 86) return 'snow'
+  // Clear / cloudy — a strong wind takes over the icon.
+  if (wind >= 38 && code <= 3) return 'wind'
+  if (code === 0 || code === 1) return isDay ? 'sun' : 'moon'
+  if (code === 2) return isDay ? 'partly' : 'partlyNight'
+  if (code === 3) return 'cloudy'
+  return isDay ? 'sun' : 'moon'
 }
 
-function stateLabel(s: WeatherState): string {
-  const map: Record<WeatherState, string> = {
-    clear_day: 'Clear', clear_night: 'Clear night',
-    partly_cloudy_day: 'Partly cloudy', partly_cloudy_night: 'Partly cloudy',
-    overcast: 'Overcast', fog: 'Foggy',
-    drizzle: 'Drizzle', rain: 'Rain', heavy_rain: 'Heavy rain',
-    snow: 'Snow', heavy_snow: 'Heavy snow', sleet: 'Sleet',
-    thunderstorm: 'Storm', loading: '…', error: '—',
-  }
-  return map[s] ?? '—'
+/** Card background gradient per condition. */
+const BG: Record<Cond, string> = {
+  sun: 'linear-gradient(165deg, #5cb1f6 0%, #2f86df 100%)',
+  partly: 'linear-gradient(165deg, #5aa9ef 0%, #3179cf 100%)',
+  cloudy: 'linear-gradient(165deg, #6f93bf 0%, #43658f 100%)',
+  fog: 'linear-gradient(165deg, #7e98b4 0%, #506c8a 100%)',
+  drizzle: 'linear-gradient(165deg, #4f86c4 0%, #2f5d97 100%)',
+  rain: 'linear-gradient(165deg, #3f6ea8 0%, #274d7d 100%)',
+  thunder: 'linear-gradient(165deg, #34527f 0%, #1c3056 100%)',
+  snow: 'linear-gradient(165deg, #8fb2d8 0%, #5b80aa 100%)',
+  wind: 'linear-gradient(165deg, #5fb6e8 0%, #3b8fd0 100%)',
+  moon: 'linear-gradient(165deg, #2b3d64 0%, #16233f 100%)',
+  partlyNight: 'linear-gradient(165deg, #2f4068 0%, #1a2842 100%)',
+  loading: 'linear-gradient(165deg, #5aa9ef 0%, #3179cf 100%)',
 }
 
-/* Japanese caption (kanji + romaji), kawaii weather-chart style. */
-function jpLabel(s: WeatherState): { kanji: string; romaji: string } {
-  const map: Record<WeatherState, { kanji: string; romaji: string }> = {
-    clear_day:           { kanji: '晴れ',   romaji: 'hare' },
-    clear_night:         { kanji: '快晴',   romaji: 'kaisei' },
-    partly_cloudy_day:   { kanji: '薄曇り', romaji: 'usugumori' },
-    partly_cloudy_night: { kanji: '薄曇り', romaji: 'usugumori' },
-    overcast:            { kanji: '曇り',   romaji: 'kumori' },
-    fog:                 { kanji: '霧',     romaji: 'kiri' },
-    drizzle:             { kanji: '小雨',   romaji: 'kosame' },
-    rain:                { kanji: '雨',     romaji: 'ame' },
-    heavy_rain:          { kanji: '大雨',   romaji: 'ooame' },
-    snow:                { kanji: '雪',     romaji: 'yuki' },
-    heavy_snow:          { kanji: '大雪',   romaji: 'ooyuki' },
-    sleet:               { kanji: 'みぞれ', romaji: 'mizore' },
-    thunderstorm:        { kanji: '雷',     romaji: 'kaminari' },
-    loading:             { kanji: '…',      romaji: '' },
-    error:               { kanji: '—',      romaji: '' },
-  }
-  return map[s] ?? { kanji: '—', romaji: '' }
+const LABEL: Record<Cond, string> = {
+  sun: 'Sunny', moon: 'Clear', partly: 'Partly cloudy', partlyNight: 'Partly cloudy',
+  cloudy: 'Cloudy', fog: 'Foggy', drizzle: 'Light rain', rain: 'Rain',
+  thunder: 'Thunderstorm', snow: 'Snow', wind: 'Windy', loading: '…',
 }
 
-/* ── Colour palette (kawaii) ─────────────────────────────────────────────── */
-const SUN          = '#FFC93D'
-const CLOUD        = '#C2E6F5'   // friendly sky-blue cloud (reads on white via die-cut)
-const CLOUD_SH     = '#A6D3EA'
-const RAINCLOUD    = '#9FB7EA'   // periwinkle rain cloud
-const RAINCLOUD_SH = '#8AA3DC'
-const GRAY         = '#A8B1BD'   // overcast / storm cloud
-const GRAY_SH      = '#929BA8'
-const SNOWCLOUD    = '#DCEEF8'
-const SNOWCLOUD_SH = '#C3E1F1'
-const FOGC         = '#C7D3DC'
-const FOGC_SH      = '#B0BEC9'
-const DROP         = '#7FB5E6'
-const DROP_D       = '#5C97D6'
-const FLAKE        = '#BFE0F5'
-const BOLT         = '#FFC400'
-const MOON         = '#FFE07A'
-const STAR         = '#FFE07A'
+/* ── Icon primitives ─────────────────────────────────────────────────────── */
 
-/* Face ink — soft charcoal-plum, like the reference chart. */
-const FACE  = '#5C5360'
-const BLUSH = '#FF9FB0'
+const SVG = 96
 
-/* ── Kawaii face primitives ──────────────────────────────────────────────── */
-
-function Eyes({ cx, cy, dx = 5, r = 2.1, wink = false, sleepy = false }: {
-  cx: number; cy: number; dx?: number; r?: number; wink?: boolean; sleepy?: boolean
-}) {
-  if (sleepy) {
-    return (
-      <>
-        <path d={`M ${cx - dx - 2.4} ${cy} q 2.4 2.6 4.8 0`} stroke={FACE} strokeWidth="1.7" fill="none" strokeLinecap="round" />
-        <path d={`M ${cx + dx - 2.4} ${cy} q 2.4 2.6 4.8 0`} stroke={FACE} strokeWidth="1.7" fill="none" strokeLinecap="round" />
-      </>
-    )
-  }
-  return (
-    <>
-      {wink
-        ? <path d={`M ${cx - dx - 2.4} ${cy} q 2.4 -2.8 4.8 0`} stroke={FACE} strokeWidth="1.8" fill="none" strokeLinecap="round" />
-        : <ellipse cx={cx - dx} cy={cy} rx={r} ry={r + 0.4} fill={FACE} />}
-      <ellipse cx={cx + dx} cy={cy} rx={r} ry={r + 0.4} fill={FACE} />
-      {!wink && <circle cx={cx - dx - 0.7} cy={cy - 1} r="0.7" fill="#fff" />}
-      <circle cx={cx + dx - 0.7} cy={cy - 1} r="0.7" fill="#fff" />
-    </>
-  )
-}
-
-function Mouth({ cx, cy, w = 4.5, depth = 2.6, sad = false }: {
-  cx: number; cy: number; w?: number; depth?: number; sad?: boolean
-}) {
-  const d = sad
-    ? `M ${cx - w} ${cy + depth} q ${w} ${-depth * 1.5} ${w * 2} 0`
-    : `M ${cx - w} ${cy} q ${w} ${depth * 1.6} ${w * 2} 0`
-  return <path d={d} stroke={FACE} strokeWidth="1.8" fill="none" strokeLinecap="round" />
-}
-
-function Blush({ cx, cy, dx = 9 }: { cx: number; cy: number; dx?: number }) {
-  return (
-    <>
-      <ellipse cx={cx - dx} cy={cy} rx="2.4" ry="1.6" fill={BLUSH} opacity="0.6" />
-      <ellipse cx={cx + dx} cy={cy} rx="2.4" ry="1.6" fill={BLUSH} opacity="0.6" />
-    </>
-  )
-}
-
-/* Puffy cloud body centred at (cx, cy). */
-function Cloud({ cx = 32, cy = 32, s = 1, fill = CLOUD, shade = CLOUD_SH }: {
-  cx?: number; cy?: number; s?: number; fill?: string; shade?: string
-}) {
+/** Soft glassy cloud centred at (cx, cy). */
+function cloud(cx: number, cy: number, s = 1, grad = 'url(#cg)') {
   return (
     <g>
-      <ellipse cx={cx - 13 * s} cy={cy + 1 * s} rx={11 * s} ry={9.5 * s} fill={fill} />
-      <ellipse cx={cx + 13 * s} cy={cy} rx={12 * s} ry={10.5 * s} fill={fill} />
-      <ellipse cx={cx} cy={cy - 8 * s} rx={13 * s} ry={12 * s} fill={fill} />
-      <rect x={cx - 23 * s} y={cy - 3 * s} width={46 * s} height={15 * s} rx={7.5 * s} fill={fill} />
-      <ellipse cx={cx} cy={cy + 8 * s} rx={18 * s} ry={4 * s} fill={shade} opacity="0.45" />
+      <ellipse cx={cx - 16 * s} cy={cy + 3 * s} rx={15 * s} ry={12.5 * s} fill={grad} />
+      <ellipse cx={cx + 15 * s} cy={cy + 1 * s} rx={16 * s} ry={13.5 * s} fill={grad} />
+      <ellipse cx={cx - 1 * s} cy={cy - 11 * s} rx={16 * s} ry={15 * s} fill={grad} />
+      <rect x={cx - 30 * s} y={cy - 2 * s} width={60 * s} height={17 * s} rx={8.5 * s} fill={grad} />
+      <ellipse cx={cx - 3 * s} cy={cy - 13 * s} rx={10 * s} ry={7 * s} fill="rgba(255,255,255,0.55)" />
     </g>
   )
 }
 
-/* Teardrop rain. */
-function Drop({ x, y, s = 1, fill = DROP }: { x: number; y: number; s?: number; fill?: string }) {
+function cloudGrad(id = 'cg') {
   return (
-    <path
-      d={`M ${x} ${y - 5 * s} C ${x + 3.3 * s} ${y - 0.5 * s} ${x + 3.3 * s} ${y + 3.6 * s} ${x} ${y + 3.6 * s} C ${x - 3.3 * s} ${y + 3.6 * s} ${x - 3.3 * s} ${y - 0.5 * s} ${x} ${y - 5 * s} Z`}
-      fill={fill}
-    />
+    <linearGradient id={id} x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stopColor="#ffffff" />
+      <stop offset="1" stopColor="#d2deec" />
+    </linearGradient>
   )
 }
 
-/* Six-point snow crystal. */
-function Flake({ cx, cy, r = 4 }: { cx: number; cy: number; r?: number }) {
+function sun(cx: number, cy: number, r: number, rays = true) {
   return (
     <g>
-      {[0, 60, 120].map(a => {
-        const rad = (a * Math.PI) / 180
-        return (
-          <line key={a}
-            x1={cx - r * Math.cos(rad)} y1={cy - r * Math.sin(rad)}
-            x2={cx + r * Math.cos(rad)} y2={cy + r * Math.sin(rad)}
-            stroke={FLAKE} strokeWidth={r * 0.45} strokeLinecap="round" />
-        )
-      })}
-      <circle cx={cx} cy={cy} r={r * 0.28} fill={FLAKE} />
+      {rays &&
+        [0, 45, 90, 135, 180, 225, 270, 315].map((a) => {
+          const t = (a * Math.PI) / 180
+          return (
+            <line
+              key={a}
+              x1={cx + (r + 5) * Math.cos(t)} y1={cy + (r + 5) * Math.sin(t)}
+              x2={cx + (r + 12) * Math.cos(t)} y2={cy + (r + 12) * Math.sin(t)}
+              stroke="#ffd166" strokeWidth="4" strokeLinecap="round"
+            />
+          )
+        })}
+      <circle cx={cx} cy={cy} r={r} fill="url(#sg)" />
+      <ellipse cx={cx - r * 0.3} cy={cy - r * 0.32} rx={r * 0.42} ry={r * 0.32} fill="rgba(255,255,255,0.4)" />
     </g>
   )
 }
 
-function Star({ cx, cy, r = 2 }: { cx: number; cy: number; r?: number }) {
-  return <circle cx={cx} cy={cy} r={r} fill={STAR} />
-}
-
-/* ── Weather illustrations ───────────────────────────────────────────────── */
-
-function ClearDay() {
+function sunGrad() {
   return (
-    <svg viewBox="0 0 64 64" fill="none" aria-hidden="true">
-      {[0, 45, 90, 135, 180, 225, 270, 315].map(a => {
-        const rad = (a * Math.PI) / 180
-        return (
-          <line key={a}
-            x1={32 + 17 * Math.cos(rad)} y1={32 + 17 * Math.sin(rad)}
-            x2={32 + 26 * Math.cos(rad)} y2={32 + 26 * Math.sin(rad)}
-            stroke={SUN} strokeWidth="3.6" strokeLinecap="round" />
-        )
-      })}
-      <circle cx="32" cy="32" r="15" fill={SUN} />
-      <Eyes cx={32} cy={30} dx={5.5} wink />
-      <Blush cx={32} cy={35} dx={10} />
-      <Mouth cx={32} cy={35} w={5} depth={3} />
-    </svg>
+    <radialGradient id="sg" cx="0.42" cy="0.4" r="0.7">
+      <stop offset="0" stopColor="#ffe9a8" />
+      <stop offset="0.6" stopColor="#ffce5e" />
+      <stop offset="1" stopColor="#ffa83f" />
+    </radialGradient>
   )
 }
 
-function ClearNight() {
+const drop = (x: number, y: number, len = 11, c = '#d6e6fb') => (
+  <rect key={`${x}-${y}`} x={x - 1.5} y={y} width="3" height={len} rx="1.5" fill={c} />
+)
+
+const Box = ({ children }: { children: React.ReactNode }) => (
+  <svg viewBox={`0 0 ${SVG} ${SVG}`} fill="none" aria-hidden="true" className={styles.iconSvg}>
+    {children}
+  </svg>
+)
+
+function moonPhase(date = new Date()) {
+  const synodic = 29.530588853
+  const knownNew = Date.UTC(2000, 0, 6, 18, 14)
+  let p = (((date.getTime() - knownNew) / 86400000) % synodic) / synodic
+  if (p < 0) p += 1
+  return p
+}
+
+function IconSun() {
+  return <Box><defs>{sunGrad()}</defs>{sun(48, 46, 20)}</Box>
+}
+
+function IconMoon() {
+  const R = 20, cx = 48, cy = 46
+  const p = moonPhase()
+  const k = (1 - Math.cos(2 * Math.PI * p)) / 2 // illuminated fraction
+  const off = (p < 0.5 ? -1 : 1) * 2 * R * k
   return (
-    <svg viewBox="0 0 64 64" fill="none" aria-hidden="true">
-      <Star cx={14} cy={16} r={1.8} />
-      <Star cx={52} cy={20} r={2.2} />
-      <Star cx={48} cy={48} r={1.6} />
-      <Star cx={16} cy={46} r={1.4} />
-      <circle cx="32" cy="32" r="15" fill={MOON} />
-      <Eyes cx={32} cy={31} dx={5.5} sleepy />
-      <Blush cx={32} cy={36} dx={10} />
-      <Mouth cx={32} cy={35} w={3.5} depth={2} />
-    </svg>
+    <Box>
+      <defs>
+        <radialGradient id="mg" cx="0.42" cy="0.38" r="0.75">
+          <stop offset="0" stopColor="#fdfdf6" />
+          <stop offset="1" stopColor="#dfe6f1" />
+        </radialGradient>
+        <clipPath id="mc"><circle cx={cx} cy={cy} r={R} /></clipPath>
+      </defs>
+      <circle cx={cx} cy={cy} r={R} fill="url(#mg)" />
+      <g clipPath="url(#mc)"><circle cx={cx + off} cy={cy} r={R} fill="#3a4d72" /></g>
+      <circle cx={cx + 6} cy={cy - 6} r="2.6" fill="rgba(120,140,175,0.25)" />
+      <circle cx={cx + 2} cy={cy + 6} r="3.4" fill="rgba(120,140,175,0.2)" />
+    </Box>
   )
 }
 
-function PartlyCloudyDay() {
+function IconPartly() {
   return (
-    <svg viewBox="0 0 64 64" fill="none" aria-hidden="true">
-      {[200, 245, 290, 335, 20].map(a => {
-        const rad = (a * Math.PI) / 180
-        return (
-          <line key={a}
-            x1={22 + 10 * Math.cos(rad)} y1={20 + 10 * Math.sin(rad)}
-            x2={22 + 16 * Math.cos(rad)} y2={20 + 16 * Math.sin(rad)}
-            stroke={SUN} strokeWidth="3" strokeLinecap="round" />
-        )
-      })}
-      <circle cx="22" cy="20" r="9.5" fill={SUN} />
-      <Cloud cx={36} cy={38} s={0.92} />
-      <Eyes cx={36} cy={37} dx={4.5} />
-      <Blush cx={36} cy={41} dx={8.5} />
-      <Mouth cx={36} cy={41} />
-    </svg>
+    <Box>
+      <defs>{sunGrad()}{cloudGrad()}</defs>
+      {sun(36, 34, 13)}
+      {cloud(52, 54, 0.9)}
+    </Box>
   )
 }
 
-function PartlyCloudyNight() {
+function IconPartlyNight() {
   return (
-    <svg viewBox="0 0 64 64" fill="none" aria-hidden="true">
-      <Star cx={48} cy={14} r={1.8} />
-      <Star cx={14} cy={18} r={1.4} />
-      <circle cx="22" cy="19" r="9.5" fill={MOON} />
-      <Cloud cx={36} cy={38} s={0.92} />
-      <Eyes cx={36} cy={37} dx={4.5} />
-      <Blush cx={36} cy={41} dx={8.5} />
-      <Mouth cx={36} cy={41} />
-    </svg>
+    <Box>
+      <defs>
+        <radialGradient id="mg2" cx="0.42" cy="0.38" r="0.75">
+          <stop offset="0" stopColor="#fdfdf6" /><stop offset="1" stopColor="#dfe6f1" />
+        </radialGradient>
+        {cloudGrad()}
+      </defs>
+      <circle cx="36" cy="33" r="13" fill="url(#mg2)" />
+      <circle cx="41" cy="30" r="13" fill="#2f4068" />
+      {cloud(52, 54, 0.9)}
+    </Box>
   )
 }
 
-function Overcast() {
+function IconCloudy() {
   return (
-    <svg viewBox="0 0 64 64" fill="none" aria-hidden="true">
-      <Cloud cx={26} cy={26} s={0.78} fill={CLOUD} shade={CLOUD_SH} />
-      <Cloud cx={36} cy={36} s={0.92} fill={GRAY} shade={GRAY_SH} />
-      <Eyes cx={36} cy={35} dx={4.5} />
-      <Blush cx={36} cy={39} dx={8.5} />
-      <Mouth cx={36} cy={39} w={4} depth={1.4} />
-    </svg>
+    <Box>
+      <defs>{cloudGrad()}{cloudGrad('cg2')}</defs>
+      {cloud(40, 38, 0.66, 'url(#cg2)')}
+      {cloud(52, 52, 0.95)}
+    </Box>
   )
 }
 
-function Fog() {
+function IconFog() {
   return (
-    <svg viewBox="0 0 64 64" fill="none" aria-hidden="true">
-      <Cloud cx={32} cy={26} s={0.95} fill={FOGC} shade={FOGC_SH} />
-      <Eyes cx={32} cy={25} dx={5} sleepy />
-      <Mouth cx={32} cy={29} w={3.5} depth={1.4} />
-      {[40, 46, 52].map((y, i) => (
-        <rect key={y} x={12 + i * 3} y={y} width={40 - i * 6} height="3.4" rx="1.7"
-          fill={FOGC} opacity={0.85 - i * 0.12} />
+    <Box>
+      <defs>{cloudGrad()}</defs>
+      {cloud(48, 38, 0.9)}
+      {[58, 66, 74].map((y, i) => (
+        <rect key={y} x={20 + i * 4} y={y} width={56 - i * 8} height="4.5" rx="2.25"
+          fill="#dbe6f3" opacity={0.9 - i * 0.18} />
       ))}
-    </svg>
+    </Box>
   )
 }
 
-function Drizzle() {
+function IconDrizzle() {
   return (
-    <svg viewBox="0 0 64 64" fill="none" aria-hidden="true">
-      <Cloud cx={32} cy={24} s={0.95} />
-      <Eyes cx={32} cy={23} dx={5} />
-      <Blush cx={32} cy={27} dx={9} />
-      <Mouth cx={32} cy={27} />
-      {[[22, 46], [32, 49], [42, 46]].map(([x, y], i) => (
-        <Drop key={i} x={x} y={y} s={0.8} />
+    <Box>
+      <defs>{cloudGrad()}</defs>
+      {cloud(48, 36, 0.92)}
+      {[[34, 60], [48, 64], [62, 60]].map(([x, y]) => drop(x, y, 8))}
+    </Box>
+  )
+}
+
+function IconRain() {
+  return (
+    <Box>
+      <defs>{cloudGrad()}</defs>
+      {cloud(48, 34, 0.95)}
+      {[[30, 58], [42, 62], [54, 58], [66, 62], [36, 72], [60, 72]].map(([x, y]) => drop(x, y, 12))}
+    </Box>
+  )
+}
+
+function IconThunder() {
+  return (
+    <Box>
+      <defs>
+        <linearGradient id="cg3" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#eef2f7" /><stop offset="1" stopColor="#c2cedd" />
+        </linearGradient>
+      </defs>
+      {cloud(48, 34, 0.95, 'url(#cg3)')}
+      <polygon points="52,52 38,72 49,72 43,86 64,62 52,62" fill="#ffd23e" />
+    </Box>
+  )
+}
+
+function IconSnow() {
+  return (
+    <Box>
+      <defs>{cloudGrad()}</defs>
+      {cloud(48, 36, 0.92)}
+      {[[34, 62], [48, 68], [62, 62], [41, 76], [55, 76]].map(([x, y]) => (
+        <circle key={`${x}-${y}`} cx={x} cy={y} r="2.6" fill="#eaf3fb" />
       ))}
-    </svg>
+    </Box>
   )
 }
 
-function Rain() {
+function IconWind() {
+  const s = { stroke: '#eaf2fb', strokeWidth: 5, fill: 'none', strokeLinecap: 'round' as const }
   return (
-    <svg viewBox="0 0 64 64" fill="none" aria-hidden="true">
-      <Cloud cx={32} cy={23} s={0.98} fill={RAINCLOUD} shade={RAINCLOUD_SH} />
-      <Eyes cx={32} cy={22} dx={5} />
-      <Blush cx={32} cy={26} dx={9} />
-      <Mouth cx={32} cy={26} />
-      {[[20, 46], [30, 50], [40, 46], [26, 56], [36, 56]].map(([x, y], i) => (
-        <Drop key={i} x={x} y={y} />
-      ))}
-    </svg>
+    <Box>
+      <path d="M16 36 H54 a9 9 0 1 0 -9 -9" {...s} />
+      <path d="M16 54 H66 a10 10 0 1 1 -10 10" {...s} />
+      <path d="M16 72 H46 a8 8 0 1 0 -8 8" {...s} />
+    </Box>
   )
 }
 
-function HeavyRain() {
-  return (
-    <svg viewBox="0 0 64 64" fill="none" aria-hidden="true">
-      <Cloud cx={32} cy={22} s={1.02} fill={RAINCLOUD} shade={RAINCLOUD_SH} />
-      <Eyes cx={32} cy={21} dx={5} sleepy />
-      <Mouth cx={32} cy={25} sad w={4} depth={2.4} />
-      {[[18, 45], [27, 50], [36, 45], [45, 50], [22, 57], [40, 57]].map(([x, y], i) => (
-        <Drop key={i} x={x} y={y} s={1.05} fill={DROP_D} />
-      ))}
-    </svg>
-  )
-}
-
-function Snow() {
-  return (
-    <svg viewBox="0 0 64 64" fill="none" aria-hidden="true">
-      <Cloud cx={32} cy={23} s={0.98} fill={SNOWCLOUD} shade={SNOWCLOUD_SH} />
-      <Eyes cx={32} cy={22} dx={5} />
-      <Blush cx={32} cy={26} dx={9} />
-      <Mouth cx={32} cy={26} />
-      <Flake cx={21} cy={48} r={4} />
-      <Flake cx={32} cy={53} r={3.4} />
-      <Flake cx={43} cy={48} r={4} />
-    </svg>
-  )
-}
-
-function HeavySnow() {
-  return (
-    <svg viewBox="0 0 64 64" fill="none" aria-hidden="true">
-      <Cloud cx={32} cy={21} s={1.02} fill={SNOWCLOUD} shade={SNOWCLOUD_SH} />
-      <Eyes cx={32} cy={20} dx={5} />
-      <Blush cx={32} cy={24} dx={9} />
-      <Mouth cx={32} cy={24} />
-      <Flake cx={18} cy={44} r={4} />
-      <Flake cx={29} cy={50} r={4} />
-      <Flake cx={40} cy={44} r={4} />
-      <Flake cx={48} cy={52} r={3.4} />
-      <Flake cx={23} cy={57} r={3.4} />
-      <Flake cx={37} cy={58} r={3.4} />
-    </svg>
-  )
-}
-
-function Sleet() {
-  return (
-    <svg viewBox="0 0 64 64" fill="none" aria-hidden="true">
-      <Cloud cx={32} cy={23} s={0.98} fill={CLOUD} shade={CLOUD_SH} />
-      <Eyes cx={32} cy={22} dx={5} />
-      <Blush cx={32} cy={26} dx={9} />
-      <Mouth cx={32} cy={26} />
-      <Drop x={22} y={48} s={0.85} />
-      <Flake cx={32} cy={51} r={3.6} />
-      <Drop x={42} y={48} s={0.85} />
-    </svg>
-  )
-}
-
-function Thunderstorm() {
-  return (
-    <svg viewBox="0 0 64 64" fill="none" aria-hidden="true">
-      <Cloud cx={32} cy={22} s={1.02} fill={GRAY} shade={GRAY_SH} />
-      <Eyes cx={32} cy={21} dx={5} />
-      <Blush cx={32} cy={25} dx={9} />
-      <Mouth cx={32} cy={26} w={3.5} depth={1.4} sad />
-      <polygon points="34,36 25,49 32,49 28,60 42,44 34,44" fill={BOLT} />
-    </svg>
-  )
-}
-
-function LoadingArt() {
-  return (
-    <svg viewBox="0 0 64 64" fill="none" aria-hidden="true">
-      <Cloud cx={32} cy={30} s={0.98} fill={CLOUD} shade={CLOUD_SH} />
-      <Eyes cx={32} cy={29} dx={5} sleepy />
-      <Mouth cx={32} cy={33} w={3} depth={1.2} />
-    </svg>
-  )
-}
-
-function WeatherArt({ state }: { state: WeatherState }) {
-  const map: Record<WeatherState, JSX.Element> = {
-    clear_day: <ClearDay />, clear_night: <ClearNight />,
-    partly_cloudy_day: <PartlyCloudyDay />, partly_cloudy_night: <PartlyCloudyNight />,
-    overcast: <Overcast />, fog: <Fog />,
-    drizzle: <Drizzle />, rain: <Rain />, heavy_rain: <HeavyRain />,
-    snow: <Snow />, heavy_snow: <HeavySnow />, sleet: <Sleet />,
-    thunderstorm: <Thunderstorm />,
-    loading: <LoadingArt />, error: <LoadingArt />,
+function WeatherIcon({ cond }: { cond: Cond }) {
+  switch (cond) {
+    case 'sun': return <IconSun />
+    case 'moon': return <IconMoon />
+    case 'partly': return <IconPartly />
+    case 'partlyNight': return <IconPartlyNight />
+    case 'cloudy': return <IconCloudy />
+    case 'fog': return <IconFog />
+    case 'drizzle': return <IconDrizzle />
+    case 'rain': return <IconRain />
+    case 'thunder': return <IconThunder />
+    case 'snow': return <IconSnow />
+    case 'wind': return <IconWind />
+    default: return <IconCloudy />
   }
-  return map[state]
 }
 
 /* ── Component ───────────────────────────────────────────────────────────── */
@@ -411,8 +292,11 @@ type WeatherStickerProps = {
 
 export function WeatherSticker({ position, onPositionChange, revealed = true, revealDelay = 0 }: WeatherStickerProps) {
   const isTouch = useIsTouch()
-  const [state, setState] = useState<WeatherState>('loading')
+  const [cond, setCond] = useState<Cond>('loading')
   const [temp, setTemp] = useState<number | null>(null)
+  const [humidity, setHumidity] = useState<number | null>(null)
+  const [wind, setWind] = useState<number | null>(null)
+  const [precip, setPrecip] = useState<number | null>(null)
 
   const rootRef = useRef<HTMLDivElement>(null)
   const dragging = useRef(false)
@@ -423,14 +307,22 @@ export function WeatherSticker({ position, onPositionChange, revealed = true, re
   useEffect(() => {
     let cancelled = false
     fetch(API)
-      .then(r => r.json())
-      .then(d => {
+      .then((r) => r.json())
+      .then((d) => {
         if (cancelled) return
-        const { temperature_2m, weathercode, is_day } = d.current
-        setTemp(Math.round(temperature_2m))
-        setState(toState(weathercode, is_day === 1))
+        const c = d.current
+        const w = Math.round(c.wind_speed_10m)
+        setTemp(Math.round(c.temperature_2m))
+        setHumidity(Math.round(c.relative_humidity_2m))
+        setWind(w)
+        // Precipitation probability for the current hour.
+        const hour = String(c.time).slice(0, 13)
+        const idx = (d.hourly?.time ?? []).findIndex((t: string) => t.slice(0, 13) === hour)
+        const prob = idx >= 0 ? d.hourly.precipitation_probability[idx] : c.precipitation > 0 ? 100 : 0
+        setPrecip(Math.round(prob ?? 0))
+        setCond(toCondition(c.weather_code, c.is_day === 1, w))
       })
-      .catch(() => { if (!cancelled) setState('error') })
+      .catch(() => { if (!cancelled) setCond('cloudy') })
     return () => { cancelled = true }
   }, [])
 
@@ -443,7 +335,6 @@ export function WeatherSticker({ position, onPositionChange, revealed = true, re
     startPos.current = { ...position }
     rootRef.current?.setPointerCapture(e.pointerId)
   }
-
   const onPointerMove = (e: React.PointerEvent) => {
     if (!dragging.current) return
     e.stopPropagation()
@@ -451,12 +342,8 @@ export function WeatherSticker({ position, onPositionChange, revealed = true, re
     const dy = e.clientY - startPtr.current.y
     if (!didDrag.current && Math.hypot(dx, dy) < DRAG_THRESHOLD) return
     didDrag.current = true
-    onPositionChange?.({
-      x: startPos.current.x + dx / CANVAS_SCALE,
-      y: startPos.current.y + dy / CANVAS_SCALE,
-    })
+    onPositionChange?.({ x: startPos.current.x + dx / CANVAS_SCALE, y: startPos.current.y + dy / CANVAS_SCALE })
   }
-
   const onPointerUp = (e: React.PointerEvent) => {
     if (!dragging.current) return
     e.stopPropagation()
@@ -464,10 +351,8 @@ export function WeatherSticker({ position, onPositionChange, revealed = true, re
     try { rootRef.current?.releasePointerCapture(e.pointerId) } catch { /* noop */ }
   }
 
-  const jp = jpLabel(state)
-
-  // Touch: no per-item drag, so finger-pan / pinch on the canvas works here too.
   const interaction = isTouch ? {} : { onPointerDown, onPointerMove, onPointerUp }
+  const val = (n: number | null) => (n === null ? '—' : `${n}`)
 
   return (
     <div
@@ -475,23 +360,37 @@ export function WeatherSticker({ position, onPositionChange, revealed = true, re
       className={styles.root}
       style={{ transform: `translate(calc(-50% + ${position.x}px), calc(-50% + ${position.y}px))` }}
       {...interaction}
-      aria-label={`Weather in Warsaw: ${stateLabel(state)}${temp !== null ? `, ${temp}°C` : ''}`}
+      aria-label={`Weather in Warsaw: ${LABEL[cond]}${temp !== null ? `, ${temp}°C` : ''}`}
     >
       <div
         className={`${styles.inner} ${revealed ? 'board-in' : 'board-hidden'}`}
         style={{ animationDelay: revealed ? `${revealDelay}s` : undefined }}
       >
-        <div className={styles.sticker}>
-          <div className={styles.art}>
-            <WeatherArt state={state} />
+        <div className={styles.card} style={{ background: BG[cond] }}>
+          <svg className={styles.hill} viewBox="0 0 200 110" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M0 110 L0 64 Q54 26 104 56 T200 46 L200 110 Z" fill="rgba(255,255,255,0.07)" />
+          </svg>
+
+          <div className={styles.iconWrap}>
+            <WeatherIcon cond={cond} />
           </div>
-          <div className={styles.caption}>
-            <span className={styles.city}>Warsaw</span>
-            <span className={styles.temp}>{temp !== null ? `${temp}°C` : '—'}</span>
-            <span className={styles.jp}>
-              <span className={styles.kanji}>{jp.kanji}</span>
-              {jp.romaji && <span className={styles.romaji}>{jp.romaji}</span>}
-            </span>
+
+          <div className={styles.temp}>{val(temp)}<span className={styles.deg}>°</span></div>
+          <div className={styles.city}>Warszawa</div>
+
+          <div className={styles.details}>
+            <div className={styles.col}>
+              <span className={styles.label}>Wind now</span>
+              <span className={styles.metric}>{val(wind)}<span className={styles.unit}>km</span></span>
+            </div>
+            <div className={styles.col}>
+              <span className={styles.label}>Humidity</span>
+              <span className={styles.metric}>{val(humidity)}<span className={styles.unit}>%</span></span>
+            </div>
+            <div className={styles.col}>
+              <span className={styles.label}>Precipitation</span>
+              <span className={styles.metric}>{val(precip)}<span className={styles.unit}>%</span></span>
+            </div>
           </div>
         </div>
       </div>

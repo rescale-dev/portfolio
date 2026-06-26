@@ -186,3 +186,226 @@
 .root:active .stack {
   transform: translateY(-2px);
 }
+
+/* ===========================================================================
+   Folder variant (prototype) — 3D purple folder whose inner card slides up
+   on hover. Trialled on a single test card.
+   =========================================================================== */
+
+.folder {
+  position: relative;
+  width: 300px;
+  height: 266px;
+  margin: 0 auto;
+}
+
+.folderBack {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  /* Light: a soft, restrained shadow — no heavy purple halo. */
+  filter: drop-shadow(0 12px 18px rgba(95, 78, 180, 0.16));
+}
+
+:global(html[data-theme='dark']) .folderBack {
+  filter: drop-shadow(0 18px 28px rgba(0, 0, 0, 0.45));
+}
+
+/* Three work cards peeking out from behind the front glass, fanned. */
+.folderPapers {
+  position: absolute;
+  inset: 0;
+  isolation: isolate;
+}
+
+.paper {
+  position: absolute;
+  left: 50%;
+  top: 52px;
+  width: 120px;
+  height: 150px;
+  margin-left: -60px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 8px 18px rgba(40, 20, 90, 0.22);
+  transform-origin: bottom center;
+  transition: transform 0.36s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.paper img,
+.paper video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Rest: cards tucked away, just peeking out behind the glass. */
+.paper:nth-child(1) {
+  transform: translate(-42px, 14px) rotate(-8deg);
+}
+.paper:nth-child(2) {
+  transform: translate(0, 2px) rotate(0deg);
+  z-index: 1;
+}
+.paper:nth-child(3) {
+  transform: translate(42px, 14px) rotate(8deg);
+}
+
+/* Hover: the cards fan up, out of the folder, to ~60% visible. */
+.root:hover .paper:nth-child(1) {
+  transform: translate(-54px, -42px) rotate(-12deg);
+}
+.root:hover .paper:nth-child(2) {
+  transform: translate(0, -52px) rotate(0deg);
+}
+.root:hover .paper:nth-child(3) {
+  transform: translate(54px, -42px) rotate(12deg);
+}
+
+/* Single tile (e.g. Motion's looping video): centred 16:9 card, no fan. */
+.single .paper {
+  width: 220px;
+  height: 124px; /* 16:9 */
+  margin-left: -110px;
+  transform: translate(0, 9px) rotate(0deg);
+}
+.root:hover .single .paper {
+  transform: translate(0, -34px) rotate(0deg);
+}
+
+/* Two square tiles (e.g. AI Creative): a smaller two-card fan. */
+.two .paper {
+  width: 132px;
+  height: 132px; /* square */
+  margin-left: -66px;
+}
+.two .paper:nth-child(1) {
+  transform: translate(-36px, 12px) rotate(-7deg);
+}
+.two .paper:nth-child(2) {
+  transform: translate(36px, 12px) rotate(7deg);
+  z-index: 1;
+}
+.root:hover .two .paper:nth-child(1) {
+  transform: translate(-44px, -40px) rotate(-10deg);
+}
+.root:hover .two .paper:nth-child(2) {
+  transform: translate(44px, -40px) rotate(10deg);
+}
+
+/* ---- Colour themes for the folder variant ------------------------------ */
+
+/* Folder-back gradient stops (CSS overrides the SVG attributes). */
+.themeBlue .folderBack stop:nth-of-type(1) { stop-color: #8a7cf6; }
+.themeBlue .folderBack stop:nth-of-type(2) { stop-color: #7160f0; }
+.themeBlue .folderBack stop:nth-of-type(3) { stop-color: #6353ec; }
+
+.themeGreen .folderBack stop:nth-of-type(1) { stop-color: #57d09a; }
+.themeGreen .folderBack stop:nth-of-type(2) { stop-color: #29b873; }
+.themeGreen .folderBack stop:nth-of-type(3) { stop-color: #1a9d62; }
+
+.themeOrange .folderBack stop:nth-of-type(1) { stop-color: #ffa24d; }
+.themeOrange .folderBack stop:nth-of-type(2) { stop-color: #ff7a3d; }
+.themeOrange .folderBack stop:nth-of-type(3) { stop-color: #f0502c; }
+
+.themeViolet .folderBack stop:nth-of-type(1) { stop-color: #b57cff; }
+.themeViolet .folderBack stop:nth-of-type(2) { stop-color: #9a5cf5; }
+.themeViolet .folderBack stop:nth-of-type(3) { stop-color: #7e34e6; }
+
+/* Front pocket tint per theme (white sheen + translucent colour). */
+.themeGreen .folderFront {
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.17) 0%, rgba(255, 255, 255, 0.07) 55%, rgba(255, 255, 255, 0.03) 100%),
+    linear-gradient(160deg, rgba(58, 190, 130, 0.62), rgba(33, 165, 103, 0.56));
+}
+.themeOrange .folderFront {
+  /* More see-through so the looping video reads through the glass. */
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.05) 55%, rgba(255, 255, 255, 0.02) 100%),
+    linear-gradient(160deg, rgba(255, 150, 80, 0.38), rgba(240, 95, 52, 0.32));
+  -webkit-backdrop-filter: blur(7px) saturate(140%);
+  backdrop-filter: blur(7px) saturate(140%);
+}
+.themeViolet .folderFront {
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.17) 0%, rgba(255, 255, 255, 0.07) 55%, rgba(255, 255, 255, 0.03) 100%),
+    linear-gradient(160deg, rgba(170, 108, 248, 0.64), rgba(138, 72, 234, 0.58));
+}
+
+/* Light-mode shadow tint per theme. */
+.themeGreen .folderBack {
+  filter: drop-shadow(0 12px 18px rgba(30, 130, 90, 0.18));
+}
+.themeOrange .folderBack {
+  filter: drop-shadow(0 12px 18px rgba(190, 80, 40, 0.2));
+}
+.themeViolet .folderBack {
+  filter: drop-shadow(0 12px 18px rgba(110, 50, 180, 0.18));
+}
+
+/* Front pocket card — translucent lighter purple. Slides up on hover. */
+.folderFront {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  top: 92px;
+  bottom: 14px;
+  padding: 26px 28px 20px;
+  /* Concentric with the folder back (radius ~22) at the 4px inset. */
+  border-radius: 18px;
+  text-align: left;
+  color: #fff;
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Satoshi', sans-serif;
+  /* Translucent purple so the backdrop blur frosts the white paper behind —
+     kept dense enough that the white title stays high-contrast. */
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.17) 0%, rgba(255, 255, 255, 0.07) 55%, rgba(255, 255, 255, 0.03) 100%),
+    linear-gradient(160deg, rgba(139, 123, 246, 0.64), rgba(120, 104, 240, 0.58));
+  -webkit-backdrop-filter: blur(13px) saturate(150%);
+  backdrop-filter: blur(13px) saturate(150%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    0 -2px 10px rgba(40, 20, 90, 0.08);
+  /* The front card sits above the sliding paper. */
+  z-index: 1;
+  overflow: hidden;
+}
+
+.folderTitle {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  /* Keeps the title legible over a more transparent (e.g. video) pane. */
+  text-shadow: 0 1px 3px rgba(20, 12, 40, 0.18);
+}
+
+/* Tag words as frosted pills at the bottom of the card. */
+.folderTags {
+  position: absolute;
+  left: 26px;
+  right: 22px;
+  bottom: 22px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.folderTags span {
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-transform: lowercase;
+  white-space: nowrap;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}

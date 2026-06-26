@@ -10,87 +10,54 @@
   transform-origin: center center;
 }
 
+/* The card is now the lanyard ID badge itself — a die-cut transparent PNG that
+   floats on the board. No surface chrome behind it. */
 .card {
   position: relative;
-  width: 300px;
-  background: var(--color-red);
-  border-radius: 22px;
-  padding: 24px;
-  color: var(--color-white);
-  box-shadow: 0 18px 40px rgba(245, 51, 63, 0.28);
-  transition: transform 0.22s ease, box-shadow 0.22s ease;
+  width: 280px;
+  transition: transform 0.22s ease;
   cursor: var(--cursor-hand);
 }
 
 .card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 26px 54px rgba(245, 51, 63, 0.38);
-}
-
-/* Hover: darken the texts to the deep navy used in the "PORTFOLIO" wordmark. */
-.card:hover .title,
-.card:hover .kana,
-.card:hover .readmore {
-  color: var(--color-ink);
 }
 
 .card:active {
   transform: translateY(-2px);
 }
 
-.head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.title {
-  font-size: 30px;
-  font-weight: 700;
-  line-height: 1.05;
-  margin: 0;
-  white-space: pre-line;
-  transition: color 0.2s ease;
-}
-
-.kana {
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  margin-top: 6px;
-  white-space: nowrap;
-  transition: color 0.2s ease;
-}
-
-.thumbWrap {
+.badge {
+  display: block;
   width: 100%;
-  height: 168px;
-  overflow: hidden;
-  border-radius: 8px;
-  margin-top: 18px;
-  background: var(--color-ink);
+  height: auto;
+  /* Off until hovered: greyscale, colour blooms in on hover. */
+  filter: grayscale(1);
+  transition: filter 0.28s ease, transform 0.22s ease;
 }
 
-.thumb {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  /* Crop a little tighter on the face (upper-centre of the frame). */
-  object-position: center 22%;
-  transform: scale(1.32);
+.card:hover .badge {
+  filter: grayscale(0);
 }
 
-.readmore {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 16px;
-  font-weight: 500;
-  margin-top: 16px;
-  transition: color 0.2s ease;
+/* Light mode: the badge has a semi-transparent plastic sleeve, so a box-shadow
+   on the bounding box would print a hard rectangle behind the see-through parts.
+   drop-shadow() follows the PNG's alpha, so the shadow hugs the actual shape and
+   fades through the transparent sleeve. */
+.badge {
+  filter: grayscale(1) drop-shadow(0 14px 26px rgba(20, 22, 34, 0.22));
 }
 
-.arrow {
-  font-weight: 700;
+.card:hover .badge {
+  filter: grayscale(0) drop-shadow(0 22px 34px rgba(20, 22, 34, 0.26));
+}
+
+/* Dark mode: badge already reads well on the dark board — drop the light-mode
+   shadow, keep only the greyscale → colour hover. */
+:global(:root[data-theme='dark']) .badge {
+  filter: grayscale(1);
+}
+
+:global(:root[data-theme='dark']) .card:hover .badge {
+  filter: grayscale(0);
 }

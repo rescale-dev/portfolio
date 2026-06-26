@@ -2,7 +2,7 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: 120px;
+  width: 168px;
   user-select: none;
   cursor: grab;
 }
@@ -14,93 +14,104 @@
   transform-origin: center center;
 }
 
-/* Die-cut sticker: no box — illustration + caption tilt together. */
-.sticker {
+/* Weather card — blue gradient (set inline per condition), no top bar. */
+.card {
+  position: relative;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
-  transform: rotate(4deg);
-  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+  padding: 22px 17px 17px;
+  border-radius: 22px;
+  color: #fff;
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Satoshi', sans-serif;
+  box-shadow: 0 22px 44px rgba(20, 40, 80, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.root:hover .sticker {
-  transform: rotate(0deg) scale(1.06);
+.root:hover .card {
+  transform: translateY(-4px) scale(1.02);
 }
-.root:active .sticker {
-  transform: rotate(0deg) scale(1.0);
+.root:active .card {
+  transform: translateY(-1px) scale(1.0);
 }
 
-.art {
-  width: 92px;
-  height: 92px;
+/* Subtle hill silhouette behind the icon, like the reference. */
+.hill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 38%;
+  width: 100%;
+  height: 46%;
+  pointer-events: none;
 }
-.art svg {
+
+.iconWrap {
+  position: relative;
+  width: 74px;
+  height: 74px;
+  margin-top: 4px;
+}
+.iconSvg {
   display: block;
   width: 100%;
   height: 100%;
-  /* White die-cut border hugging the illustration's alpha shape
-     (8 directions ≈ ~2px) + a soft contact shadow. */
-  filter:
-    drop-shadow(2px 0 0 #fff) drop-shadow(-2px 0 0 #fff)
-    drop-shadow(0 2px 0 #fff) drop-shadow(0 -2px 0 #fff)
-    drop-shadow(1.5px 1.5px 0 #fff) drop-shadow(-1.5px 1.5px 0 #fff)
-    drop-shadow(1.5px -1.5px 0 #fff) drop-shadow(-1.5px -1.5px 0 #fff)
-    drop-shadow(0 6px 7px rgba(19, 24, 43, 0.26));
-}
-
-/* ── Caption ───────────────────────────────────────────────
-   No box — text floats on the board. A white halo keeps it
-   legible on the light board; in dark mode the ink token flips
-   light and the halo is harmless. */
-.caption {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: -2px;
-  text-shadow:
-    0 0 3px #fff,
-    1px 0 0 #fff, -1px 0 0 #fff, 0 1px 0 #fff, 0 -1px 0 #fff,
-    1px 1px 0 #fff, -1px 1px 0 #fff, 1px -1px 0 #fff, -1px -1px 0 #fff;
-}
-:root[data-theme='dark'] .caption {
-  text-shadow:
-    0 0 4px rgba(14, 17, 24, 0.9),
-    1px 1px 0 rgba(14, 17, 24, 0.7), -1px -1px 0 rgba(14, 17, 24, 0.7);
-}
-
-.city {
-  font-size: 9.5px;
-  font-weight: 800;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--color-muted);
+  filter: drop-shadow(0 8px 10px rgba(10, 24, 50, 0.28));
 }
 
 .temp {
-  font-size: 30px;
-  font-weight: 800;
+  position: relative;
+  margin-top: 6px;
+  font-size: 52px;
+  font-weight: 700;
+  line-height: 1;
   letter-spacing: -0.03em;
-  line-height: 1.05;
-  color: var(--color-ink);
 }
-
-.jp {
-  display: flex;
-  align-items: baseline;
-  gap: 5px;
-  margin-top: 1px;
-}
-
-.kanji {
-  font-size: 14px;
-  font-weight: 800;
-  color: #E8762A;
-  letter-spacing: 0.04em;
-}
-
-.romaji {
-  font-size: 10px;
+.deg {
   font-weight: 600;
-  color: var(--color-muted);
-  letter-spacing: 0.02em;
+}
+
+.city {
+  position: relative;
+  margin-top: 3px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  opacity: 0.96;
+}
+
+.details {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  gap: 5px;
+  width: 100%;
+  margin-top: 18px;
+}
+.col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  text-align: center;
+}
+.label {
+  font-size: 8px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  opacity: 0.78;
+  white-space: nowrap;
+}
+.metric {
+  margin-top: 3px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.unit {
+  font-size: 9px;
+  font-weight: 600;
+  opacity: 0.8;
+  margin-left: 1px;
 }
