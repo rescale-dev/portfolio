@@ -13,7 +13,7 @@ type AboutCardProps = {
 }
 
 export function AboutCard({ data, revealed = true, revealDelay = 0, onOpen, position, onPositionChange }: AboutCardProps) {
-  const { title, thumbnail } = data
+  const { thumbnail } = data
   const isTouch = useIsTouch()
   const pos = position ?? data.position
   const { elRef, wasDragged, handlers } = useDraggable(pos, onPositionChange)
@@ -38,7 +38,7 @@ export function AboutCard({ data, revealed = true, revealDelay = 0, onOpen, posi
           <img
             className={styles.badge}
             src={thumbnail}
-            alt={title.replace('\n', ' ')}
+            alt="Damian Tylus, designer — ID badge"
             draggable={false}
             fetchPriority="high"
           />

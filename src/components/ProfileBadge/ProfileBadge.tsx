@@ -14,7 +14,7 @@ export function ProfileBadge({ onClick }: ProfileBadgeProps) {
       onClick={onClick}
       aria-label="Experience"
     >
-      <img className={styles.avatar} src={AVATAR} alt="Damian" draggable={false} />
+      <img className={styles.avatar} src={AVATAR} alt="Damian Tylus, graphic and motion designer" draggable={false} />
     </button>
   )
 }

@@ -4,7 +4,7 @@ export type Theme = 'light' | 'dark'
 
 const STORAGE_KEY = 'theme'
 
-/** Read the persisted theme, defaulting to light. Mirrors the inline boot
+/** Read the persisted theme, defaulting to dark. Mirrors the inline boot
     script in index.html so React and the pre-paint state never disagree. */
 export function getInitialTheme(): Theme {
   try {
@@ -13,7 +13,7 @@ export function getInitialTheme(): Theme {
   } catch {
     /* localStorage blocked (private mode) — fall through to default */
   }
-  return 'light'
+  return 'dark'
 }
 
 /** Single source of truth for the light/dark theme. Applies `data-theme` on

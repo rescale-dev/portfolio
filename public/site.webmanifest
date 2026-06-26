@@ -1,0 +1,14 @@
+{
+  "name": "Damian Tylus — Graphic & Motion Designer",
+  "short_name": "Damian Tylus",
+  "description": "Portfolio of Damian Tylus — graphic design, case studies, professional motion animation and AI-assisted creative work.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0e1118",
+  "theme_color": "#0e1118",
+  "icons": [
+    { "src": "/favicon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any" },
+    { "src": "/icon-192.png", "type": "image/png", "sizes": "192x192", "purpose": "any maskable" },
+    { "src": "/apple-touch-icon.png", "type": "image/png", "sizes": "180x180" }
+  ]
+}

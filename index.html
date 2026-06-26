@@ -3,16 +3,19 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
-    <!-- Apply saved theme before paint (default: light) to avoid a flash -->
+    <!-- Apply saved theme before paint (default: dark) to avoid a flash -->
     <script>
       (function () {
         try {
           var t = localStorage.getItem('theme');
-          document.documentElement.dataset.theme = t === 'dark' || t === 'light' ? t : 'light';
+          document.documentElement.dataset.theme = t === 'dark' || t === 'light' ? t : 'dark';
         } catch (e) {
-          document.documentElement.dataset.theme = 'light';
+          document.documentElement.dataset.theme = 'dark';
         }
       })();
     </script>
@@ -41,6 +44,7 @@
     <meta property="og:image" content="https://damiandesign.pl/about-me.jpg" />
     <meta property="og:image:width" content="1776" />
     <meta property="og:image:height" content="1184" />
+    <meta property="og:image:alt" content="Damian Tylus — graphic and motion designer" />
     <meta property="og:locale" content="en_US" />
     <meta property="og:site_name" content="Damian Tylus Portfolio" />
 
@@ -49,10 +53,10 @@
     <meta name="twitter:title" content="Damian Tylus — Graphic &amp; Motion Designer" />
     <meta name="twitter:description" content="Portfolio of Damian Tylus — Graphic Designer and Motion Designer based in Poland. Performance ads, social media, motion showreels, AI creative." />
     <meta name="twitter:image" content="https://damiandesign.pl/about-me.jpg" />
+    <meta name="twitter:image:alt" content="Damian Tylus — graphic and motion designer" />
 
-    <!-- Theme colour -->
-    <meta name="theme-color" content="#0e1118" media="(prefers-color-scheme: dark)" />
-    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <!-- Theme colour (site opens in dark mode by default) -->
+    <meta name="theme-color" content="#0e1118" />
 
     <!-- Structured data — Person -->
     <script type="application/ld+json">
@@ -72,7 +76,71 @@
       "worksFor": [
         {"@type": "Organization", "name": "Vilaro"},
         {"@type": "Organization", "name": "Esperienza"}
-      ]
+      ],
+      "hasOccupation": {
+        "@type": "Occupation",
+        "name": "Graphic & Motion Designer",
+        "skills": "Graphic design, motion design, performance advertising, key visuals, branding, video editing, AI-assisted creative production"
+      }
+    }
+    </script>
+
+    <!-- Structured data — Website + the four portfolio areas -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Damian Tylus Portfolio",
+      "url": "https://damiandesign.pl",
+      "inLanguage": "en",
+      "author": {"@type": "Person", "name": "Damian Tylus"},
+      "about": "Portfolio of graphic design, case studies, professional motion animation and AI-assisted creative work.",
+      "mainEntity": {
+        "@type": "ItemList",
+        "name": "Portfolio sections",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "item": {
+              "@type": "CreativeWork",
+              "name": "Graphic Design",
+              "url": "https://damiandesign.pl/#graphic-design",
+              "description": "Performance ads, social media visuals and key visuals for brands such as Dr. Oetker, Hama, Vileda and LOT Polish Airlines."
+            }
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "item": {
+              "@type": "CreativeWork",
+              "name": "Motion",
+              "url": "https://damiandesign.pl/#motion",
+              "description": "Professional motion design: 2D and 3D animation, showreels and FOOH (fake out-of-home) pieces."
+            }
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "item": {
+              "@type": "CreativeWork",
+              "name": "Case Studies",
+              "url": "https://damiandesign.pl/#case-studies",
+              "description": "End-to-end projects: a landscaping company website (UI/UX in Framer, +34% quality enquiries) and the citytools brand identity."
+            }
+          },
+          {
+            "@type": "ListItem",
+            "position": 4,
+            "item": {
+              "@type": "CreativeWork",
+              "name": "AI Creative",
+              "url": "https://damiandesign.pl/#ai-creative",
+              "description": "AI-assisted creative production: AI ad workflow, AI photo generation, AI video with the Kling model and AI upscaling with Magnific."
+            }
+          }
+        ]
+      }
     }
     </script>
 
@@ -95,7 +163,7 @@
     <noscript>
       <main>
         <h1>Damian Tylus &mdash; Graphic &amp; Motion Designer</h1>
-        <p>Portfolio of Damian Tylus &mdash; Graphic Designer and Motion Designer based in Poland. Specialising in performance ads, social media visuals, motion showreels, key visuals, branding and AI-assisted creative work for brands including &Zdot;abka, LOT Polish Airlines, Dr. Oetker and Hama.</p>
+        <p>Portfolio of Damian Tylus &mdash; Graphic Designer and Motion Designer based in Poland. The work spans four areas: graphic design (performance ads, social media visuals and key visuals), case studies (end-to-end web and branding projects), professional motion animation (2D, 3D and FOOH) and AI-assisted creative production. Clients include &Zdot;abka, LOT Polish Airlines, Dr. Oetker, Hama and Vileda.</p>
         <nav aria-label="Portfolio sections">
           <ul>
             <li><a href="#graphic-design">Graphic Design</a></li>
@@ -110,7 +178,7 @@
         </section>
         <section id="motion">
           <h2>Motion</h2>
-          <p>2D, 3D and FOOH motion showreels and loop animations.</p>
+          <p>Professional motion animation: 2D and 3D animation, motion showreels (2023, 2024), motion design and FOOH (fake out-of-home) loop animations.</p>
         </section>
         <section id="case-studies">
           <h2>Case Studies</h2>
